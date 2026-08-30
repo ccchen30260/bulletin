@@ -138,7 +138,7 @@
             color: var(--primary-color);
             border: 2px solid var(--primary-color);
             border-radius: 50px;
-            padding: 10px 24px;
+            padding: 8px 20px;
             font-weight: 600;
             transition: var(--transition);
         }
@@ -469,16 +469,6 @@
         .toast-custom .toast-icon-error {
             color: var(--danger-color);
         }
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
 
         /* 影片容器 */
         .video-container {
@@ -500,7 +490,34 @@
             border: none;
         }
 
-        /* 詳情圖庫與放大效果 */
+        /* 詳情內文與嵌入照片樣式 */
+        .detail-inline-image-card {
+            cursor: pointer;
+            transition: var(--transition);
+            background: #f0f4f8;
+            max-width: 100%;
+        }
+        .detail-inline-image-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+        }
+        .detail-inline-image-card .zoom-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .detail-inline-image-card:hover .zoom-overlay {
+            opacity: 1;
+        }
+
         .detail-image-gallery {
             display: flex;
             flex-wrap: wrap;
@@ -533,10 +550,7 @@
         }
         .detail-image-card .zoom-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.35);
             display: flex;
             align-items: center;
@@ -550,7 +564,7 @@
             opacity: 1;
         }
 
-        /* 圖片放大預覽燈箱層級置頂修正 */
+        /* 圖片放大燈箱層級 */
         #lightboxModal {
             z-index: 1080 !important;
             background: rgba(0, 0, 0, 0.85);
@@ -559,77 +573,51 @@
 </head>
 <body>
 
-    <!-- 頂部導航欄 -->
+    <!-- 頂部導航欄 (整合管理分類按鈕) -->
     <nav class="navbar-custom">
         <div class="container">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <a class="navbar-brand-custom text-decoration-none" href="#">
                     <i class="bi bi-megaphone-fill"></i>宣導事項管理系統
                 </a>
-                <span class="nav-badge">
-                    <i class="bi bi-person-gear me-1"></i>管理員後台
-                </span>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-custom-outline me-1" onclick="openCategoryModal()">
+                        <i class="bi bi-tags me-1"></i>管理分類項目
+                    </button>
+                    <span class="nav-badge">
+                        <i class="bi bi-person-gear me-1"></i>管理員後台
+                    </span>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- 主要內容區 -->
     <div class="container">
-        <!-- 搜尋與操作區 -->
+        <!-- 搜尋與新增操作區 -->
         <div class="search-section">
             <div class="row g-3 align-items-center">
-                <div class="col-lg-5 col-md-6">
+                <div class="col-lg-7 col-md-6">
                     <div class="search-input-group">
                         <i class="bi bi-search search-icon"></i>
                         <input type="text" id="searchInput" class="form-control" placeholder="搜尋主旨或內容..." oninput="filterAnnouncements()">
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-4">
+                <div class="col-lg-3 col-md-3">
                     <select id="categoryFilter" class="form-select filter-select" onchange="filterAnnouncements()">
                         <option value="all">全部分類</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-6 d-flex gap-2 flex-wrap">
-                    <button class="btn btn-custom-primary" onclick="openAddModal()">
+                <div class="col-lg-2 col-md-3 text-end">
+                    <button class="btn btn-custom-primary w-100" onclick="openAddModal()">
                         <i class="bi bi-plus-lg me-1"></i>新增宣導
                     </button>
-                    <button class="btn btn-custom-outline" onclick="openCategoryModal()">
-                        <i class="bi bi-tags me-1"></i>管理分類
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 統計資訊 -->
-        <div class="row mt-4 mb-3" id="statsRow">
-            <div class="col-md-3 col-6 mb-2">
-                <div class="text-center p-3 rounded-4" style="background:rgba(255,255,255,0.85);box-shadow:var(--card-shadow);">
-                    <h4 class="fw-bold mb-0" id="statTotal" style="color:var(--primary-color);">0</h4>
-                    <small class="text-muted">總宣導數</small>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-2">
-                <div class="text-center p-3 rounded-4" style="background:rgba(255,255,255,0.85);box-shadow:var(--card-shadow);">
-                    <h4 class="fw-bold mb-0" id="statPublished" style="color:#27ae60;">0</h4>
-                    <small class="text-muted">已發布</small>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-2">
-                <div class="text-center p-3 rounded-4" style="background:rgba(255,255,255,0.85);box-shadow:var(--card-shadow);">
-                    <h4 class="fw-bold mb-0" id="statDraft" style="color:#f39c12;">0</h4>
-                    <small class="text-muted">草稿</small>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-2">
-                <div class="text-center p-3 rounded-4" style="background:rgba(255,255,255,0.85);box-shadow:var(--card-shadow);">
-                    <h4 class="fw-bold mb-0" id="statCategories" style="color:#8e44ad;">0</h4>
-                    <small class="text-muted">分類數</small>
                 </div>
             </div>
         </div>
 
         <!-- 宣導事項列表 -->
-        <div class="row g-4" id="announcementGrid">
+        <div class="row g-4 mt-2" id="announcementGrid">
             <!-- 動態生成 -->
         </div>
 
@@ -667,7 +655,8 @@
                             </div>
                             <div class="col-12">
                                 <label class="form-label" for="formContent">主體內容 <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="formContent" rows="5" placeholder="輸入宣導事項的詳細內容..." required></textarea>
+                                <textarea class="form-control" id="formContent" rows="6" placeholder="輸入宣導事項的詳細內容..." required></textarea>
+                                <small class="text-muted mt-1 d-block"><i class="bi bi-info-circle me-1"></i>提示：若要在內文中插入對應照片，可在內文中輸入 <b>[圖1]</b>、<b>[圖2]</b> 等標籤，系統將自動將第 1 張、第 2 張照片放置於該文字位置。</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="formStatus">狀態</label>
@@ -844,7 +833,6 @@
                 allCategories = data.categories || [];
                 renderCategoryFilter();
                 renderCategoryList();
-                updateStats();
                 filterAnnouncements();
             } else {
                 showToast(data.message || '載入資料失敗', 'error');
@@ -909,14 +897,6 @@
                 `;
             });
             container.innerHTML = html;
-        }
-
-        // ==================== 更新統計 ====================
-        function updateStats() {
-            document.getElementById('statTotal').textContent = allAnnouncements.length;
-            document.getElementById('statPublished').textContent = allAnnouncements.filter(a => a.status === '已發布').length;
-            document.getElementById('statDraft').textContent = allAnnouncements.filter(a => a.status === '草稿').length;
-            document.getElementById('statCategories').textContent = allCategories.length;
         }
 
         // ==================== 篩選與搜尋 ====================
@@ -1098,7 +1078,7 @@
             renderImagePreviews();
         }
 
-        // ==================== 處理圖片上傳 (不進行壓縮) ====================
+        // ==================== 處理圖片上傳 ====================
         function handleImageUpload(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
@@ -1219,7 +1199,7 @@
             }
         }
 
-        // ==================== 查看詳情與圖片放大 ====================
+        // ==================== 查看詳情 (圖文並茂解析) ====================
         function openDetailModal(id) {
             const item = allAnnouncements.find(a => a.id === id);
             if (!item) return;
@@ -1228,21 +1208,48 @@
             const dateStr = formatDate(item.createdAt);
             const catColor = getCategoryColor(item.category);
 
-            let imagesHtml = '';
-            if (images.length > 0) {
-                imagesHtml = '<div class="detail-image-gallery">';
-                images.forEach(function(url) {
+            const usedImageIndices = new Set();
+            let rawContent = escapeHtml(item.content || '');
+
+            // 解析 [圖1]、[圖2]、[photo1] 混排相片
+            let formattedContent = rawContent.replace(/\[(?:圖|img|photo)(\d+)\]/gi, function(match, p1) {
+                const index = parseInt(p1, 10) - 1;
+                if (index >= 0 && index < images.length) {
+                    usedImageIndices.add(index);
+                    const directUrl = getDirectImageUrl(images[index]);
+                    return `
+                        <div class="my-3 text-center">
+                            <div class="detail-inline-image-card d-inline-block position-relative rounded-3 overflow-hidden shadow-sm" onclick="openLightbox('${directUrl}')" title="點擊放大觀看">
+                                <img src="${directUrl}" class="img-fluid rounded-3" style="max-height: 380px; object-fit: contain; cursor: pointer;" alt="照片 ${p1}">
+                                <div class="zoom-overlay"><i class="bi bi-zoom-in me-1"></i> 點擊放大</div>
+                            </div>
+                            <div class="small text-muted mt-1">圖 ${p1}</div>
+                        </div>
+                    `;
+                }
+                return match;
+            });
+
+            // 未插在文字中間的照片排至底部
+            const remainingImages = images.filter((_, idx) => !usedImageIndices.has(idx));
+            let remainingImagesHtml = '';
+
+            if (remainingImages.length > 0) {
+                remainingImagesHtml = `
+                    <hr>
+                    <h6 class="fw-bold mb-2"><i class="bi bi-images me-1"></i>照片 (點擊可放大觀看)</h6>
+                    <div class="detail-image-gallery">
+                `;
+                remainingImages.forEach(function(url) {
                     const directUrl = getDirectImageUrl(url);
-                    imagesHtml += `
+                    remainingImagesHtml += `
                         <div class="detail-image-card" onclick="openLightbox('${directUrl}')" title="點擊放大觀看">
                             <img src="${directUrl}" alt="圖片" onerror="this.parentElement.style.display='none';">
                             <div class="zoom-overlay"><i class="bi bi-zoom-in"></i></div>
                         </div>
                     `;
                 });
-                imagesHtml += '</div>';
-            } else {
-                imagesHtml = '<p class="text-muted"><i class="bi bi-image me-1"></i>無圖片</p>';
+                remainingImagesHtml += '</div>';
             }
 
             let videoHtml = '';
@@ -1250,13 +1257,13 @@
                 const embedUrl = getEmbedUrl(item.videoUrl);
                 if (embedUrl) {
                     videoHtml = `
-                        <div class="video-container">
+                        <div class="video-container mt-3">
                             <iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         </div>
                     `;
                 } else {
                     videoHtml =
-                        `<p><a href="${escapeHtml(item.videoUrl)}" target="_blank"><i class="bi bi-link-45deg me-1"></i>觀看影片連結</a></p>`;
+                        `<p class="mt-2"><a href="${escapeHtml(item.videoUrl)}" target="_blank"><i class="bi bi-link-45deg me-1"></i>觀看影片連結</a></p>`;
                 }
             }
 
@@ -1273,12 +1280,9 @@
                     </span>
                 </div>
                 <h4 class="fw-bold mb-3">${escapeHtml(item.subject)}</h4>
-                <div class="mb-3" style="white-space:pre-wrap;line-height:1.8;">${escapeHtml(item.content)}</div>
-                <hr>
-                <h6 class="fw-bold mb-2"><i class="bi bi-images me-1"></i>圖片 (點擊可放大觀看)</h6>
-                ${imagesHtml}
-                <h6 class="fw-bold mt-3 mb-2"><i class="bi bi-play-circle me-1"></i>影片</h6>
-                ${videoHtml || '<p class="text-muted">無影片</p>'}
+                <div class="mb-3" style="white-space:pre-wrap;line-height:1.8;">${formattedContent}</div>
+                ${remainingImagesHtml}
+                ${videoHtml ? `<h6 class="fw-bold mt-4 mb-2"><i class="bi bi-play-circle me-1"></i>影片</h6>${videoHtml}` : ''}
             `;
 
             document.getElementById('detailBody').innerHTML = detailHtml;
