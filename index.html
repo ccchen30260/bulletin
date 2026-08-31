@@ -254,14 +254,11 @@
         </div>
     </div>
 
-    <!-- 詳情 Modal（加入語言切換按鈕） -->
+    <!-- 詳情 Modal（已取消內部語言切換按鈕） -->
     <div class="modal fade" id="detailModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header d-flex justify-content-between align-items-center">
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill" id="detailLangToggle" onclick="toggleLanguage()">
-                        <i class="bi bi-translate"></i> <span id="detailLangBtnText">EN</span>
-                    </button>
+                <div class="modal-header">
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="detailBody"></div>
@@ -294,7 +291,7 @@
         let currentLang = 'zh';     
         let adminToken = '';        
         let colorPalette = ['#2c6e9b', '#4a9e6b', '#8e44ad', '#e67e22', '#c0392b', '#16a085', '#d35400', '#2980b9'];
-        let currentDetailId = null; // 記錄目前開啟的詳情 ID
+        let currentDetailId = null; // 記錄目前開啟的詳情 ID，切換語言時刷新內容
 
         // 僅保留需要雙語切換的前台文字
         const i18n = {
@@ -319,7 +316,6 @@
             if (currentRole === 'admin') return; // 管理員不可切換
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
-            document.getElementById('detailLangBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
             applyLanguage();
             if(allAnnouncements.length > 0) filterAnnouncements();
             // 如果詳情視窗開啟，重新載入內容
@@ -345,12 +341,10 @@
             if (role === 'admin') {
                 currentLang = 'zh';
                 document.getElementById('langBtnText').innerText = 'EN';
-                document.getElementById('detailLangBtnText').innerText = 'EN';
             }
 
             // 語言切換按鈕僅訪客可見
             document.getElementById('langToggleBtn').style.display = role === 'viewer' ? 'inline-block' : 'none';
-            document.getElementById('detailLangToggle').style.display = role === 'viewer' ? 'inline-block' : 'none';
 
             // 管理員專用按鈕顯示控制
             document.querySelectorAll('.admin-only').forEach(el => {
