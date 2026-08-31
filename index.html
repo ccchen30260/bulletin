@@ -3,1420 +3,647 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>宣導事項管理系統</title>
+    <title>宣導事項管理系統 / Announcement System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2c6e9b;
-            --primary-light: #e8f0f8;
-            --accent-color: #4a9e6b;
-            --danger-color: #c0392b;
-            --text-dark: #2c3e50;
-            --text-muted: #7f8c8d;
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --card-hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --border-radius: 16px;
-            --border-radius-sm: 10px;
+            --primary-color: #2c6e9b; --primary-light: #e8f0f8; --accent-color: #4a9e6b;
+            --danger-color: #c0392b; --text-dark: #2c3e50; --text-muted: #7f8c8d;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius: 16px; --border-radius-sm: 10px;
         }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f0f4f8, #e6ecf3, #f5f0ea); min-height: 100vh; color: var(--text-dark); padding-bottom: 60px; }
+        
+        /* 登入畫面 */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #f0f4f8, #dce8f5); z-index: 3000; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .admin-only { display: none; }
 
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
-            background: linear-gradient(135deg, #f0f4f8 0%, #e6ecf3 30%, #f0eef5 60%, #f5f0ea 100%);
-            min-height: 100vh;
-            color: var(--text-dark);
-            padding-bottom: 60px;
-        }
-
-        /* 頂部導航欄 */
-        .navbar-custom {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-            padding: 16px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04);
-        }
-        .navbar-brand-custom {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color) !important;
-            letter-spacing: 0.5px;
-        }
-        .navbar-brand-custom i {
-            font-size: 1.7rem;
-            margin-right: 10px;
-            color: var(--accent-color);
-        }
-        .nav-badge {
-            background: var(--primary-light);
-            color: var(--primary-color);
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-
-        /* 搜尋欄 */
-        .search-section {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(15px);
-            border-radius: var(--border-radius);
-            padding: 24px;
-            margin-top: 28px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-        }
-        .search-input-group {
-            position: relative;
-        }
-        .search-input-group .form-control {
-            border-radius: 50px;
-            padding: 12px 20px 12px 48px;
-            border: 2px solid #e0e8f0;
-            font-size: 1rem;
-            transition: var(--transition);
-            background: #fafcfe;
-        }
-        .search-input-group .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(44, 110, 155, 0.1);
-            background: #fff;
-        }
-        .search-input-group .search-icon {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            pointer-events: none;
-        }
-        .filter-select {
-            border-radius: 50px;
-            padding: 12px 20px;
-            border: 2px solid #e0e8f0;
-            background: #fafcfe;
-            font-weight: 500;
-            transition: var(--transition);
-            cursor: pointer;
-        }
-        .filter-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(44, 110, 155, 0.1);
-        }
-
-        /* 按鈕樣式 */
-        .btn-custom-primary {
-            background: var(--primary-color);
-            color: #fff;
-            border: none;
-            border-radius: 50px;
-            padding: 12px 28px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(44, 110, 155, 0.35);
-        }
-        .btn-custom-primary:hover {
-            background: #1f5580;
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(44, 110, 155, 0.45);
-        }
-        .btn-custom-outline {
-            background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            border-radius: 50px;
-            padding: 8px 20px;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-        .btn-custom-outline:hover {
-            background: var(--primary-color);
-            color: #fff;
-            transform: translateY(-2px);
-        }
-
-        /* 分類標籤 */
-        .category-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.4px;
-            text-transform: uppercase;
-            transition: var(--transition);
-        }
-        .category-badge:hover {
-            transform: scale(1.05);
-            cursor: pointer;
-        }
-
-        /* 卡片樣式 */
-        .announcement-card {
-            background: #fff;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            transition: var(--transition);
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-            position: relative;
-        }
-        .announcement-card:hover {
-            box-shadow: var(--card-hover-shadow);
-            transform: translateY(-4px);
-        }
-        .card-image-wrapper {
-            position: relative;
-            width: 100%;
-            height: 200px;
-            background: #f0f4f8;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        .card-image-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        .card-image-wrapper img:hover {
-            transform: scale(1.05);
-        }
-        .card-image-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #e8f0f8, #dce8f5);
-            color: var(--text-muted);
-            font-size: 3rem;
-        }
-        .card-body-custom {
-            padding: 20px 22px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .card-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text-dark);
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .card-text-preview {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            margin-bottom: 14px;
-            flex: 1;
-        }
-        .card-meta {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            padding-top: 12px;
-            border-top: 1px solid #f0f0f0;
-        }
-        .card-meta i {
-            margin-right: 4px;
-        }
-        .card-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .card-actions .btn {
-            border-radius: 50px;
-            font-size: 0.8rem;
-            padding: 6px 14px;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
-        .status-dot.published {
-            background: #27ae60;
-            box-shadow: 0 0 8px rgba(39, 174, 96, 0.5);
-        }
-        .status-dot.draft {
-            background: #f39c12;
-            box-shadow: 0 0 8px rgba(243, 156, 18, 0.5);
-        }
-
-        /* 模態框 */
-        .modal-content {
-            border-radius: var(--border-radius);
-            border: none;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-        .modal-header {
-            background: linear-gradient(135deg, var(--primary-color), #1f5580);
-            color: #fff;
-            border: none;
-            padding: 20px 28px;
-        }
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-            opacity: 0.7;
-        }
-        .modal-body {
-            padding: 28px;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-        .modal-footer {
-            border-top: 1px solid #f0f0f0;
-            padding: 16px 28px;
-        }
-
-        /* 表單樣式 */
-        .form-label {
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 0.9rem;
-            margin-bottom: 6px;
-        }
-        .form-control, .form-select {
-            border-radius: var(--border-radius-sm);
-            border: 2px solid #e0e8f0;
-            padding: 10px 16px;
-            transition: var(--transition);
-            font-size: 0.95rem;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(44, 110, 155, 0.1);
-        }
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
-        }
+        /* 導航與搜尋 */
+        .navbar-custom { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); padding: 16px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 20px rgba(0,0,0,0.04); }
+        .search-section { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); border-radius: var(--border-radius); padding: 24px; margin-top: 28px; box-shadow: var(--card-shadow); border: 1px solid rgba(255,255,255,0.7); }
+        
+        /* 按鈕與卡片 */
+        .btn-custom-primary { background: var(--primary-color); color: #fff; border-radius: 50px; padding: 10px 24px; transition: var(--transition); border:none; font-weight:600;}
+        .btn-custom-primary:hover { background: #1f5580; color: #fff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(44,110,155,0.3); }
+        .announcement-card { background: #fff; border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--card-shadow); transition: var(--transition); height: 100%; display: flex; flex-direction: column; cursor: pointer; }
+        .announcement-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+        .card-image-wrapper { position: relative; height: 200px; background: #f0f4f8; overflow: hidden; flex-shrink: 0; }
+        .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .announcement-card:hover .card-image-wrapper img { transform: scale(1.05); }
+        .card-image-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #e8f0f8, #dce8f5); color: var(--text-muted); font-size: 3rem; }
+        .card-body-custom { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-text-preview { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 14px; flex: 1; }
+        .category-badge { display: inline-block; padding: 6px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .status-dot.published { background: #27ae60; box-shadow: 0 0 8px rgba(39,174,96,0.5); }
+        .status-dot.draft { background: #f39c12; box-shadow: 0 0 8px rgba(243,156,18,0.5); }
 
         /* 圖片上傳區 */
-        .upload-area {
-            border: 2px dashed #c5d5e5;
-            border-radius: var(--border-radius-sm);
-            padding: 24px;
-            text-align: center;
-            background: #fafcfe;
-            transition: var(--transition);
-            cursor: pointer;
-        }
-        .upload-area:hover {
-            border-color: var(--primary-color);
-            background: var(--primary-light);
-        }
-        .upload-area i {
-            font-size: 2.5rem;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-        .upload-area.dragover {
-            border-color: var(--primary-color);
-            background: var(--primary-light);
-            transform: scale(1.01);
-        }
-        .image-preview-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 15px;
-        }
-        .image-preview-item {
-            position: relative;
-            width: 110px;
-            height: 110px;
-            border-radius: var(--border-radius-sm);
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .image-preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .image-preview-item .remove-image {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            background: rgba(192, 57, 43, 0.9);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 12px;
-            transition: var(--transition);
-        }
-        .image-preview-item .remove-image:hover {
-            background: #a93226;
-            transform: scale(1.1);
-        }
+        .upload-area { border: 2px dashed #c5d5e5; border-radius: var(--border-radius-sm); padding: 24px; text-align: center; background: #fafcfe; cursor: pointer; transition: var(--transition); }
+        .upload-area:hover, .upload-area.dragover { border-color: var(--primary-color); background: var(--primary-light); }
+        .upload-area i { font-size: 2.5rem; color: var(--text-muted); margin-bottom: 10px; }
+        .image-preview-item { position: relative; width: 110px; height: 110px; border-radius: var(--border-radius-sm); overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: inline-block; margin: 5px; }
+        .image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .image-preview-item .remove-image { position: absolute; top: 4px; right: 4px; background: rgba(192,57,43,0.9); color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 12px; }
 
-        /* 分類管理 */
-        .category-list-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 18px;
-            border-radius: var(--border-radius-sm);
-            background: #fafcfe;
-            margin-bottom: 8px;
-            transition: var(--transition);
-            border: 1px solid #e8eef5;
-        }
-        .category-list-item:hover {
-            background: var(--primary-light);
-            border-color: #c5d5e5;
-        }
-        .category-list-item .cat-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        .category-color-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 10px;
-            display: inline-block;
-        }
-
-        /* 空狀態 */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.4;
-        }
-        .empty-state h5 {
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 8px;
-        }
-
-        /* Toast */
-        .toast-container-custom {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 9999;
-        }
-        .toast-custom {
-            background: #fff;
-            border-radius: var(--border-radius-sm);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            padding: 16px 22px;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 300px;
-            animation: slideInRight 0.4s ease;
-            border-left: 4px solid var(--accent-color);
-        }
-        .toast-custom.error {
-            border-left-color: var(--danger-color);
-        }
-        .toast-custom i {
-            font-size: 1.3rem;
-        }
-        .toast-custom .toast-icon-success {
-            color: var(--accent-color);
-        }
-        .toast-custom .toast-icon-error {
-            color: var(--danger-color);
-        }
-
-        /* 影片容器 */
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: var(--border-radius-sm);
-            background: #000;
-            margin-top: 10px;
-        }
-        .video-container iframe,
-        .video-container video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* 詳情內文與嵌入照片樣式 (高緊密連續感) */
-        .detail-inline-image-wrapper {
-            display: block;
-            text-align: center;
-            margin: 6px 0;
-            padding: 2px 0;
-        }
-        .detail-inline-image-card {
-            cursor: pointer;
-            transition: var(--transition);
-            background: #f0f4f8;
-            max-width: 100%;
-        }
-        .detail-inline-image-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important;
-        }
-        .detail-inline-image-card .zoom-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.35);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 0.85rem;
-            font-weight: 600;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .detail-inline-image-card:hover .zoom-overlay {
-            opacity: 1;
-        }
-
-        .detail-image-gallery {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 10px;
-        }
-        .detail-image-card {
-            position: relative;
-            width: 140px;
-            height: 105px;
-            border-radius: 10px;
-            overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: var(--transition);
-            background: #f0f4f8;
-        }
-        .detail-image-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-        }
-        .detail-image-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-        }
-        .detail-image-card:hover img {
-            transform: scale(1.08);
-        }
-        .detail-image-card .zoom-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.35);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 1.5rem;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .detail-image-card:hover .zoom-overlay {
-            opacity: 1;
-        }
-
-        /* 圖片放大燈箱層級 */
-        #lightboxModal {
-            z-index: 1080 !important;
-            background: rgba(0, 0, 0, 0.85);
-        }
+        /* 詳情內文與圖片 */
+        .detail-inline-image-wrapper { display: block; text-align: center; margin: 6px 0; }
+        .detail-inline-image-card { cursor: pointer; transition: var(--transition); max-width: 100%; }
+        .detail-inline-image-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important; }
+        .detail-image-gallery { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+        .detail-image-card { width: 140px; height: 105px; border-radius: 10px; overflow: hidden; cursor: pointer; position: relative; background: #f0f4f8; }
+        .detail-image-card img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* 其他 */
+        .toast-container-custom { position: fixed; bottom: 30px; right: 30px; z-index: 9999; }
+        .toast-custom { background: #fff; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 16px 22px; margin-top: 10px; display: flex; align-items: center; gap: 12px; animation: slideInRight 0.4s ease; border-left: 4px solid var(--accent-color); }
+        .toast-custom.error { border-left-color: var(--danger-color); }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius-sm); margin-top: 10px; background: #000; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .category-list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-radius: var(--border-radius-sm); background: #fafcfe; margin-bottom: 8px; border: 1px solid #e8eef5; }
+        #lightboxModal { z-index: 1080 !important; background: rgba(0,0,0,0.85); }
     </style>
 </head>
 <body>
 
-    <!-- 頂部導航欄 (整合管理分類按鈕) -->
+    <!-- 登入畫面 -->
+    <div id="loginOverlay">
+        <div class="login-card">
+            <h3 class="fw-bold mb-4" data-i18n="sys_title">宣導事項管理系統</h3>
+            <button class="btn btn-outline-secondary w-100 mb-4 rounded-pill" onclick="setRole('viewer')" data-i18n="guest_view">進入觀看 (Guest View)</button>
+            <div class="border-top pt-4">
+                <h6 class="text-muted mb-3" data-i18n="admin_login">管理員登入</h6>
+                <input type="password" id="loginPwd" class="form-control mb-3 rounded-pill text-center" data-i18n-placeholder="pwd_placeholder">
+                <button class="btn btn-custom-primary w-100" onclick="handleLogin()" data-i18n="login_btn">登入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頂部導航欄 -->
     <nav class="navbar-custom">
         <div class="container">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <a class="navbar-brand-custom text-decoration-none" href="#">
-                    <i class="bi bi-megaphone-fill"></i>宣導事項管理系統
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 w-100">
+                <a class="navbar-brand text-decoration-none fw-bold" style="color:var(--primary-color);" href="#">
+                    <i class="bi bi-megaphone-fill me-2"></i><span data-i18n="sys_title">宣導事項管理系統</span>
                 </a>
                 <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-custom-outline me-1" onclick="openCategoryModal()">
-                        <i class="bi bi-tags me-1"></i>管理分類項目
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" onclick="toggleLanguage()">
+                        <i class="bi bi-translate"></i> <span id="langBtnText">EN</span>
                     </button>
-                    <span class="nav-badge">
-                        <i class="bi bi-person-gear me-1"></i>管理員後台
-                    </span>
+                    <button class="btn btn-sm btn-outline-primary rounded-pill admin-only" onclick="openCategoryModal()" style="display:none;">
+                        <i class="bi bi-tags me-1"></i><span data-i18n="manage_categories">管理分類</span>
+                    </button>
+                    <button class="btn btn-sm btn-outline-dark rounded-pill admin-only" onclick="openPwdModal()" style="display:none;">
+                        <i class="bi bi-key me-1"></i><span data-i18n="change_pwd">變更密碼</span>
+                    </button>
+                    <span class="badge bg-secondary rounded-pill px-3 py-2" id="roleBadge">Guest</span>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- 主要內容區 -->
-    <div class="container">
-        <!-- 搜尋與新增操作區 -->
+    <div class="container" id="mainContent" style="display:none;">
         <div class="search-section">
-            <div class="row g-3 align-items-center">
-                <div class="col-lg-7 col-md-6">
-                    <div class="search-input-group">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="text" id="searchInput" class="form-control" placeholder="搜尋主旨或內容..." oninput="filterAnnouncements()">
+            <div class="row g-3">
+                <div class="col-lg-7">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 rounded-start-pill"><i class="bi bi-search"></i></span>
+                        <input type="text" id="searchInput" class="form-control border-start-0 rounded-end-pill" data-i18n-placeholder="search_placeholder" oninput="filterAnnouncements()">
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
-                    <select id="categoryFilter" class="form-select filter-select" onchange="filterAnnouncements()">
-                        <option value="all">全部分類</option>
+                <div class="col-lg-3">
+                    <select id="categoryFilter" class="form-select rounded-pill" onchange="filterAnnouncements()">
+                        <option value="all" data-i18n="all_categories">全部分類</option>
                     </select>
                 </div>
-                <div class="col-lg-2 col-md-3 text-end">
+                <div class="col-lg-2 text-end admin-only" style="display:none;">
                     <button class="btn btn-custom-primary w-100" onclick="openAddModal()">
-                        <i class="bi bi-plus-lg me-1"></i>新增宣導
+                        <i class="bi bi-plus-lg me-1"></i><span data-i18n="add_announcement">新增宣導</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- 宣導事項列表 -->
-        <div class="row g-4 mt-2" id="announcementGrid">
-            <!-- 動態生成 -->
-        </div>
-
-        <!-- 空狀態 -->
-        <div id="emptyState" class="empty-state" style="display:none;">
-            <i class="bi bi-inbox"></i>
-            <h5>尚無宣導事項</h5>
-            <p>點擊「新增宣導」開始建立您的第一則宣導內容</p>
+        <div class="row g-4 mt-2" id="announcementGrid"></div>
+        <div id="emptyState" class="text-center py-5 text-muted" style="display:none;">
+            <i class="bi bi-inbox" style="font-size: 4rem; opacity:0.4;"></i>
+            <h5 class="mt-3 fw-bold" data-i18n="no_data">尚無資料</h5>
         </div>
     </div>
 
     <!-- 新增/編輯宣導事項模態框 -->
-    <div class="modal fade" id="announcementModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="announcementModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">
-                        <i class="bi bi-plus-circle me-2"></i>新增宣導事項
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" data-i18n="edit_announcement">編輯宣導事項</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="announcementForm">
-                        <input type="hidden" id="formId" value="">
-                        <div class="row g-3">
-                            <div class="col-md-8">
-                                <label class="form-label" for="formSubject">主旨 <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="formSubject" placeholder="輸入宣導事項主旨" required>
+                    <input type="hidden" id="formId" value="">
+                    
+                    <ul class="nav nav-tabs mb-3" role="tablist">
+                        <li class="nav-item"><button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#zh-pane" type="button">中文內容</button></li>
+                        <li class="nav-item"><button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#en-pane" type="button">English Content</button></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- 中文 -->
+                        <div class="tab-pane fade show active" id="zh-pane">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">主旨 (中文) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="formSubject" required>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label" for="formCategory">分類 <span class="text-danger">*</span></label>
-                                <select class="form-select" id="formCategory" required>
-                                    <option value="">選擇分類</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label" for="formContent">主體內容 <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="formContent" rows="6" placeholder="輸入宣導事項的詳細內容..." required></textarea>
-                                <small class="text-muted mt-1 d-block"><i class="bi bi-info-circle me-1"></i>提示：可在內文中輸入 <b>[圖1]</b>、<b>[圖2]</b> 標籤，照片將緊密插入該段文字中。</small>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" for="formStatus">狀態</label>
-                                <select class="form-select" id="formStatus">
-                                    <option value="已發布">已發布</option>
-                                    <option value="草稿">草稿</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" for="formVideoUrl">影片連結（YouTube / Google Drive）</label>
-                                <input type="url" class="form-control" id="formVideoUrl" placeholder="https://youtube.com/watch?v=...">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">上傳圖片（可多選）</label>
-                                <div class="upload-area" id="uploadArea" onclick="document.getElementById('imageInput').click()">
-                                    <i class="bi bi-cloud-arrow-up"></i>
-                                    <p class="mb-0 text-muted">點擊選擇圖片，或拖曳圖片到此處</p>
-                                    <small class="text-muted">支援 JPG、PNG、GIF</small>
-                                </div>
-                                <input type="file" id="imageInput" accept="image/*" multiple style="display:none;" onchange="handleImageUpload(event)">
-                                <div class="image-preview-container" id="imagePreviewContainer"></div>
-                                <input type="hidden" id="existingImages" value="">
-                                <input type="hidden" id="deletedImages" value="">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">內文 (中文) <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="formContent" rows="5" placeholder="可輸入 [圖1] 將照片插在文字中" required></textarea>
                             </div>
                         </div>
-                    </form>
+                        <!-- 英文 -->
+                        <div class="tab-pane fade" id="en-pane">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Subject (English)</label>
+                                <input type="text" class="form-control" id="formSubjectEn">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Content (English)</label>
+                                <textarea class="form-control" id="formContentEn" rows="5" placeholder="Use [img1] to insert photos"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" data-i18n="category">分類</label>
+                            <select class="form-select" id="formCategory" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" data-i18n="status">狀態</label>
+                            <select class="form-select" id="formStatus">
+                                <option value="已發布">已發布</option>
+                                <option value="草稿">草稿</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">影片連結</label>
+                            <input type="url" class="form-control" id="formVideoUrl">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold" data-i18n="upload_images">上傳圖片</label>
+                            <div class="upload-area" id="uploadArea" onclick="document.getElementById('imageInput').click()">
+                                <i class="bi bi-cloud-arrow-up"></i>
+                                <p class="mb-0 text-muted" data-i18n="upload_hint">點擊選擇圖片，或拖曳圖片到此處</p>
+                            </div>
+                            <input type="file" id="imageInput" accept="image/*" multiple style="display:none;" onchange="handleImageUpload(event)">
+                            <div class="mt-2" id="imagePreviewContainer"></div>
+                            <input type="hidden" id="existingImages" value="">
+                            <input type="hidden" id="deletedImages" value="">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle me-1"></i>取消
-                    </button>
-                    <button type="button" class="btn btn-custom-primary" onclick="saveAnnouncement()">
-                        <i class="bi bi-check-circle me-1"></i>儲存
-                    </button>
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal" data-i18n="cancel">取消</button>
+                    <button type="button" class="btn btn-custom-primary" onclick="saveAnnouncement()" data-i18n="save">儲存</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 詳情查看模態框 -->
-    <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <!-- 變更密碼模態框 -->
+    <div class="modal fade" id="pwdModal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-file-earmark-text me-2"></i>宣導事項詳情
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                    <h6 class="modal-title fw-bold" data-i18n="change_pwd">變更密碼</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body" id="detailBody">
-                    <!-- 動態生成 -->
+                <div class="modal-body">
+                    <input type="password" id="oldPwd" class="form-control mb-2" data-i18n-placeholder="old_pwd">
+                    <input type="password" id="newPwd" class="form-control" data-i18n-placeholder="new_pwd">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">關閉</button>
+                    <button type="button" class="btn btn-custom-primary w-100" onclick="submitChangePwd()" data-i18n="save">儲存</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 分類管理模態框 -->
-    <div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="categoryModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-tags me-2"></i>管理分類項目
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                    <h5 class="modal-title"><i class="bi bi-tags me-2"></i><span data-i18n="manage_categories">管理分類</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex gap-2 mb-3">
-                        <input type="text" class="form-control" id="newCategoryName" placeholder="輸入新分類名稱..." onkeydown="if(event.key==='Enter')addCategory()">
-                        <button class="btn btn-custom-primary" onclick="addCategory()" style="white-space:nowrap;">
-                            <i class="bi bi-plus-lg me-1"></i>新增
-                        </button>
+                        <input type="text" class="form-control" id="newCategoryName" onkeydown="if(event.key==='Enter')addCategory()">
+                        <button class="btn btn-custom-primary text-nowrap" onclick="addCategory()"><i class="bi bi-plus-lg me-1"></i><span data-i18n="save">儲存</span></button>
                     </div>
-                    <div id="categoryList">
-                        <!-- 動態生成 -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">關閉</button>
+                    <div id="categoryList"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 圖片放大預覽模態框 (Lightbox) -->
-    <div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
+    <!-- 詳情 Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body" id="detailBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 圖片放大預覽 Modal -->
+    <div class="modal fade" id="lightboxModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content bg-transparent border-0">
                 <div class="modal-body text-center p-0 position-relative">
-                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="關閉" style="z-index: 1090; background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 12px;"></button>
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" style="z-index: 1090; background-color: rgba(0,0,0,0.6); padding: 12px;"></button>
                     <img id="lightboxImage" src="" class="img-fluid rounded-3 shadow-lg" style="max-height: 88vh; object-fit: contain;">
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast 通知容器 -->
     <div class="toast-container-custom" id="toastContainer"></div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
         // ==================== 全局配置 ====================
-        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz32SiE_GF7VTocrIcrg6Ge8j8q2aktkOjZ9yStxSzZutS-c5m5ASWtX89NpnwRRavP/exec';
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzzRX66BNW16sQ_sCNSif6ES-2fkrrEgT_RaEF7dBdhoyvoYsPmnXI1fYSotYV2_trf/exec';
+        
+        let allAnnouncements = [], allCategories = [];
+        let newImagesToUpload = [], existingImagesList = [], deletedImagesList = [];
+        let currentRole = 'viewer'; 
+        let currentLang = 'zh';     
+        let adminToken = '';        
+        let colorPalette = ['#2c6e9b', '#4a9e6b', '#8e44ad', '#e67e22', '#c0392b', '#16a085', '#d35400', '#2980b9'];
 
-        // ==================== 全域變數 ====================
-        let allAnnouncements = [];
-        let allCategories = [];
-        let newImagesToUpload = [];
-        let existingImagesList = [];
-        let deletedImagesList = [];
-        let announcementModal, detailModal, categoryModal, lightboxModal;
-        let colorPalette = [
-            '#2c6e9b', '#4a9e6b', '#8e44ad', '#e67e22', '#c0392b',
-            '#16a085', '#d35400', '#2980b9', '#27ae60', '#f39c12',
-            '#1abc9c', '#e74c3c', '#3498db', '#9b59b6', '#2ecc71'
-        ];
+        const i18n = {
+            zh: { sys_title: "宣導事項管理系統", guest_view: "進入觀看 (Guest View)", admin_login: "管理員登入", pwd_placeholder: "請輸入密碼", login_btn: "登入", manage_categories: "管理分類", change_pwd: "變更密碼", search_placeholder: "搜尋主旨或內容...", all_categories: "全部分類", add_announcement: "新增宣導", no_data: "尚無資料", edit_announcement: "編輯宣導", category: "分類", status: "狀態", cancel: "取消", save: "儲存", old_pwd: "舊密碼", new_pwd: "新密碼", role_admin: "管理員", role_guest: "一般訪客", upload_images: "上傳圖片", upload_hint: "點擊選擇圖片，或拖曳圖片到此處" },
+            en: { sys_title: "Announcement System", guest_view: "Continue as Guest", admin_login: "Admin Login", pwd_placeholder: "Enter Password", login_btn: "Login", manage_categories: "Categories", change_pwd: "Password", search_placeholder: "Search...", all_categories: "All Categories", add_announcement: "Add New", no_data: "No Data Available", edit_announcement: "Edit", category: "Category", status: "Status", cancel: "Cancel", save: "Save", old_pwd: "Old Password", new_pwd: "New Password", role_admin: "Admin", role_guest: "Guest", upload_images: "Upload Images", upload_hint: "Click or drag images here" }
+        };
 
-        // ==================== Google Drive 圖片連結修正工具 ====================
-        function getDirectImageUrl(url) {
-            if (!url) return '';
-            if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+        // ==================== 初始化與通訊 ====================
+        document.addEventListener('DOMContentLoaded', () => setupDragDrop());
 
-            let fileId = null;
-            const match1 = url.match(/[?&]id=([^&]+)/);
-            if (match1) fileId = match1[1];
-            const match2 = url.match(/\/file\/d\/([^\/]+)/);
-            if (match2) fileId = match2[1];
-
-            if (fileId) {
-                return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1600';
-            }
-            return url;
-        }
-
-        // ==================== 與後端通信函數 ====================
         async function callGAS(action, data = {}) {
             try {
-                const response = await fetch(GAS_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8'
-                    },
-                    body: JSON.stringify({ action, ...data })
+                const res = await fetch(GAS_API_URL, {
+                    method: 'POST', body: JSON.stringify({ action, adminPwd: adminToken, ...data })
                 });
-                const result = await response.json();
-                return result;
-            } catch (error) {
-                console.error('GAS 請求失敗:', error);
-                return { success: false, message: '網絡錯誤：' + error.message };
-            }
+                return await res.json();
+            } catch (e) { return { success: false, message: '網路錯誤' }; }
         }
 
-        // ==================== 初始化 ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
-            detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
-            categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
-            lightboxModal = new bootstrap.Modal(document.getElementById('lightboxModal'));
+        // ==================== 語言與身分 ====================
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
+            applyLanguage();
+            if(allAnnouncements.length > 0) filterAnnouncements();
+        }
 
-            setupDragDrop();
+        function applyLanguage() {
+            const dict = i18n[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = dict[el.getAttribute('data-i18n')] || el.innerText);
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = dict[el.getAttribute('data-i18n-placeholder')] || el.placeholder);
+            document.getElementById('roleBadge').innerText = currentRole === 'admin' ? dict.role_admin : dict.role_guest;
+            renderCategoryFilter();
+        }
+
+        function setRole(role, pwd = '') {
+            currentRole = role; adminToken = pwd;
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            
+            const displayStyle = role === 'admin' ? '' : 'none';
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = role === 'admin' ? (el.tagName==='BUTTON'||el.tagName==='DIV'?'inline-block':'block') : 'none';
+            });
+            applyLanguage();
             loadAllData();
-        });
+        }
 
-        // ==================== 資料載入 ====================
+        async function handleLogin() {
+            const pwd = document.getElementById('loginPwd').value;
+            if(!pwd) return showToast('請輸入密碼', 'error');
+            const res = await callGAS('login', { password: pwd });
+            if(res.success) setRole('admin', pwd);
+            else showToast('密碼錯誤', 'error');
+        }
+
+        async function submitChangePwd() {
+            const oldP = document.getElementById('oldPwd').value;
+            const newP = document.getElementById('newPwd').value;
+            if(!oldP || !newP) return;
+            const res = await callGAS('changePassword', { oldPassword: oldP, newPassword: newP });
+            if(res.success) { showToast('變更成功', 'success'); adminToken = newP; bootstrap.Modal.getInstance(document.getElementById('pwdModal')).hide(); }
+            else showToast(res.message, 'error');
+        }
+
+        function openPwdModal() { 
+            document.getElementById('oldPwd').value = ''; document.getElementById('newPwd').value = '';
+            new bootstrap.Modal(document.getElementById('pwdModal')).show(); 
+        }
+
+        // ==================== 讀取與渲染 ====================
         async function loadAllData() {
             const data = await callGAS('getAllData');
-            if (data && data.categories) {
+            if (data.categories) {
                 allAnnouncements = data.announcements || [];
                 allCategories = data.categories || [];
                 renderCategoryFilter();
-                renderCategoryList();
                 filterAnnouncements();
-            } else {
-                showToast(data.message || '載入資料失敗', 'error');
             }
         }
 
-        // ==================== 渲染分類篩選器 ====================
+        function getCategoryColor(catName) {
+            const idx = allCategories.findIndex(c => c.name === catName);
+            return idx >= 0 ? colorPalette[idx % colorPalette.length] : '#2c6e9b';
+        }
+
         function renderCategoryFilter() {
             const select = document.getElementById('categoryFilter');
-            const currentValue = select.value;
-            select.innerHTML = '<option value="all">全部分類</option>';
-            allCategories.forEach(function(cat) {
-                const opt = document.createElement('option');
-                opt.value = cat.name;
-                opt.textContent = cat.name;
-                select.appendChild(opt);
-            });
-            if (currentValue && currentValue !== 'all') {
-                select.value = currentValue;
-            }
-
             const formSelect = document.getElementById('formCategory');
-            const formCurrent = formSelect.value;
-            formSelect.innerHTML = '<option value="">選擇分類</option>';
-            allCategories.forEach(function(cat) {
-                const opt = document.createElement('option');
-                opt.value = cat.name;
-                opt.textContent = cat.name;
-                formSelect.appendChild(opt);
-            });
-            if (formCurrent) formSelect.value = formCurrent;
+            const currentFilter = select.value;
+            
+            let catHtml = allCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            select.innerHTML = `<option value="all">${i18n[currentLang].all_categories}</option>` + catHtml;
+            formSelect.innerHTML = catHtml;
+            if(currentFilter && currentFilter !== 'all') select.value = currentFilter;
         }
 
-        // ==================== 渲染分類管理列表 ====================
-        function renderCategoryList() {
-            const container = document.getElementById('categoryList');
-            if (allCategories.length === 0) {
-                container.innerHTML =
-                    '<div class="text-center text-muted py-4"><i class="bi bi-folder2-open" style="font-size:2rem;"></i><p class="mt-2 mb-0">尚無分類項目</p></div>';
-                return;
-            }
-            let html = '';
-            allCategories.forEach(function(cat, index) {
-                const color = colorPalette[index % colorPalette.length];
-                const count = allAnnouncements.filter(a => a.category === cat.name).length;
-                html += `
-                    <div class="category-list-item">
-                        <div class="d-flex align-items-center">
-                            <span class="category-color-dot" style="background:${color};"></span>
-                            <span class="cat-name">${escapeHtml(cat.name)}</span>
-                            <span class="badge ms-2" style="background:#f0f0f0;color:#666;">${count} 則</span>
-                        </div>
-                        <div class="d-flex gap-1">
-                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="editCategory('${escapeHtml(cat.name)}', ${index})">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteCategory('${escapeHtml(cat.name)}')">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        // ==================== 篩選與搜尋 ====================
         function filterAnnouncements() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-            const categoryFilter = document.getElementById('categoryFilter').value;
-
-            let filtered = allAnnouncements.filter(function(item) {
-                const matchSearch = !searchTerm ||
-                    (item.subject && item.subject.toLowerCase().includes(searchTerm)) ||
-                    (item.content && item.content.toLowerCase().includes(searchTerm));
-                const matchCategory = categoryFilter === 'all' || item.category === categoryFilter;
-                return matchSearch && matchCategory;
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const cat = document.getElementById('categoryFilter').value;
+            let filtered = allAnnouncements.filter(item => {
+                const subj = currentLang === 'en' && item.subjectEn ? item.subjectEn : item.subject;
+                const cont = currentLang === 'en' && item.contentEn ? item.contentEn : item.content;
+                const matchSearch = subj.toLowerCase().includes(term) || cont.toLowerCase().includes(term);
+                const matchCat = cat === 'all' || item.category === cat;
+                const matchStatus = currentRole === 'admin' || item.status === '已發布';
+                return matchSearch && matchCat && matchStatus;
             });
-
-            filtered.sort(function(a, b) {
-                return new Date(b.createdAt) - new Date(a.createdAt);
-            });
-
+            filtered.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
             renderAnnouncementGrid(filtered);
         }
 
-        // ==================== 渲染宣導事項網格 ====================
         function renderAnnouncementGrid(items) {
             const grid = document.getElementById('announcementGrid');
-            const emptyState = document.getElementById('emptyState');
-
-            if (items.length === 0) {
-                grid.innerHTML = '';
-                emptyState.style.display = 'block';
-                return;
-            }
-            emptyState.style.display = 'none';
-
+            if(items.length === 0) { grid.innerHTML = ''; document.getElementById('emptyState').style.display = 'block'; return;}
+            document.getElementById('emptyState').style.display = 'none';
+            
             let html = '';
-            items.forEach(function(item) {
-                const images = item.imageUrls ? item.imageUrls.split('||').filter(u => u.trim() !== '') : [];
-                const firstImage = images.length > 0 ? getDirectImageUrl(images[0]) : '';
-                const statusClass = item.status === '已發布' ? 'published' : 'draft';
+            items.forEach(item => {
+                const subj = currentLang === 'en' && item.subjectEn ? item.subjectEn : item.subject;
+                const cont = currentLang === 'en' && item.contentEn ? item.contentEn : item.content;
+                const images = item.imageUrls ? item.imageUrls.split('||').filter(u=>u) : [];
+                const firstImg = images.length > 0 ? getDirectImageUrl(images[0]) : '';
                 const catColor = getCategoryColor(item.category);
-                const dateStr = formatDate(item.createdAt);
+                const statusClass = item.status === '已發布' ? 'published' : 'draft';
+                const d = new Date(item.createdAt).toLocaleDateString();
+
+                let adminBtns = currentRole === 'admin' ? `
+                    <div class="mt-2 pt-2 border-top d-flex gap-2" onclick="event.stopPropagation()">
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="openEditModal('${item.id}')"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteAnnouncement('${item.id}')"><i class="bi bi-trash"></i></button>
+                    </div>` : '';
 
                 html += `
-                    <div class="col-xl-4 col-lg-6 col-md-6">
-                        <div class="announcement-card" onclick="openDetailModal('${item.id}')">
-                            <div class="card-image-wrapper">
-                                ${firstImage ? 
-                                    `<img src="${firstImage}" alt="封面圖片" loading="lazy" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'bi bi-image\'></i></div>';">` : 
-                                    `<div class="card-image-placeholder"><i class="bi bi-image"></i></div>`
-                                }
-                                <span class="position-absolute top-0 start-0 m-2">
-                                    <span class="category-badge" style="background:${catColor}20;color:${catColor};border:1px solid ${catColor}40;">
-                                        ${escapeHtml(item.category)}
-                                    </span>
-                                </span>
-                                <span class="position-absolute top-0 end-0 m-2">
-                                    <span class="category-badge" style="background:rgba(255,255,255,0.9);color:#333;">
-                                        <span class="status-dot ${statusClass}"></span>${escapeHtml(item.status)}
-                                    </span>
-                                </span>
+                <div class="col-xl-4 col-md-6">
+                    <div class="announcement-card" onclick="openDetailModal('${item.id}')">
+                        <div class="card-image-wrapper">
+                            ${firstImg ? `<img src="${firstImg}">` : `<div class="card-image-placeholder"><i class="bi bi-image"></i></div>`}
+                            <span class="position-absolute top-0 start-0 m-2 category-badge" style="background:${catColor}20;color:${catColor};border:1px solid ${catColor}40;">${item.category}</span>
+                            <span class="position-absolute top-0 end-0 m-2 category-badge bg-white text-dark"><span class="status-dot ${statusClass}"></span>${item.status}</span>
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="card-title">${escapeHtml(subj)}</div>
+                            <div class="card-text-preview">${escapeHtml(cont)}</div>
+                            <div class="text-muted d-flex align-items-center gap-3" style="font-size:0.8rem;">
+                                <span><i class="bi bi-calendar3"></i> ${d}</span>
+                                <span><i class="bi bi-images"></i> ${images.length}</span>
                             </div>
-                            <div class="card-body-custom">
-                                <div class="card-title">${escapeHtml(item.subject)}</div>
-                                <div class="card-text-preview">${escapeHtml(item.content)}</div>
-                                <div class="card-meta">
-                                    <span><i class="bi bi-calendar3"></i>${dateStr}</span>
-                                    <span><i class="bi bi-images"></i>${images.length} 張圖片</span>
-                                </div>
-                                <div class="card-actions" onclick="event.stopPropagation();">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('${item.id}')">
-                                        <i class="bi bi-pencil"></i> 編輯
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAnnouncement('${item.id}')">
-                                        <i class="bi bi-trash"></i> 刪除
-                                    </button>
-                                </div>
-                            </div>
+                            ${adminBtns}
                         </div>
                     </div>
-                `;
+                </div>`;
             });
             grid.innerHTML = html;
         }
 
-        // ==================== 取得分類顏色 ====================
-        function getCategoryColor(categoryName) {
-            const index = allCategories.findIndex(c => c.name === categoryName);
-            if (index >= 0) return colorPalette[index % colorPalette.length];
-            return '#2c6e9b';
-        }
-
-        // ==================== 新增宣導事項 ====================
-        function openAddModal() {
-            document.getElementById('modalTitle').innerHTML = '<i class="bi bi-plus-circle me-2"></i>新增宣導事項';
-            document.getElementById('formId').value = '';
-            document.getElementById('formSubject').value = '';
-            document.getElementById('formContent').value = '';
-            document.getElementById('formStatus').value = '已發布';
-            document.getElementById('formVideoUrl').value = '';
-            document.getElementById('formCategory').value = '';
-            document.getElementById('existingImages').value = '';
-            document.getElementById('deletedImages').value = '';
-            newImagesToUpload = [];
-            existingImagesList = [];
-            deletedImagesList = [];
-            document.getElementById('imagePreviewContainer').innerHTML = '';
-            document.getElementById('imageInput').value = '';
-            announcementModal.show();
-        }
-
-        // ==================== 編輯宣導事項 ====================
-        function openEditModal(id) {
-            const item = allAnnouncements.find(a => a.id === id);
-            if (!item) return;
-
-            document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil-square me-2"></i>編輯宣導事項';
-            document.getElementById('formId').value = item.id;
-            document.getElementById('formSubject').value = item.subject || '';
-            document.getElementById('formContent').value = item.content || '';
-            document.getElementById('formStatus').value = item.status || '已發布';
-            document.getElementById('formVideoUrl').value = item.videoUrl || '';
-            document.getElementById('formCategory').value = item.category || '';
-
-            const existingUrls = item.imageUrls ? item.imageUrls.split('||').filter(u => u.trim() !== '') : [];
-            existingImagesList = [...existingUrls];
-            newImagesToUpload = [];
-            deletedImagesList = [];
-            document.getElementById('existingImages').value = existingUrls.join('||');
-            document.getElementById('deletedImages').value = '';
-            document.getElementById('imageInput').value = '';
-            renderImagePreviews();
-
-            announcementModal.show();
-        }
-
-        // ==================== 渲染圖片預覽 ====================
-        function renderImagePreviews() {
-            const container = document.getElementById('imagePreviewContainer');
-            let html = '';
-
-            existingImagesList.forEach(function(url, index) {
-                const directUrl = getDirectImageUrl(url);
-                html += `
-                    <div class="image-preview-item">
-                        <img src="${directUrl}" alt="已上傳圖片" onerror="this.style.display='none';">
-                        <button type="button" class="remove-image" onclick="removeExistingImage(${index})" title="移除圖片">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    </div>
-                `;
-            });
-
-            newImagesToUpload.forEach(function(dataUrl, index) {
-                html += `
-                    <div class="image-preview-item">
-                        <img src="${dataUrl}" alt="新上傳圖片">
-                        <button type="button" class="remove-image" onclick="removeNewImage(${index})" title="移除圖片">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        // ==================== 移除圖片 ====================
-        function removeExistingImage(index) {
-            const url = existingImagesList[index];
-            existingImagesList.splice(index, 1);
-            deletedImagesList.push(url);
-            document.getElementById('existingImages').value = existingImagesList.join('||');
-            document.getElementById('deletedImages').value = deletedImagesList.join('||');
-            renderImagePreviews();
-        }
-
-        function removeNewImage(index) {
-            newImagesToUpload.splice(index, 1);
-            renderImagePreviews();
-        }
-
-        // ==================== 處理圖片上傳 ====================
-        function handleImageUpload(event) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-
-            const totalImages = existingImagesList.length + newImagesToUpload.length + files.length;
-            if (totalImages > 10) {
-                showToast('最多只能上傳 10 張圖片', 'error');
-                event.target.value = '';
-                return;
-            }
-
-            Array.from(files).forEach(function(file) {
-                if (!file.type.startsWith('image/')) {
-                    showToast('檔案「' + file.name + '」不是圖片格式', 'error');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    newImagesToUpload.push(e.target.result);
-                    renderImagePreviews();
-                };
-                reader.readAsDataURL(file);
-            });
-            event.target.value = '';
-        }
-
-        // ==================== 設定拖曳上傳 ====================
-        function setupDragDrop() {
-            const uploadArea = document.getElementById('uploadArea');
-            uploadArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            uploadArea.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-            });
-            uploadArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                if (files && files.length > 0) {
-                    const dt = new DataTransfer();
-                    Array.from(files).forEach(f => dt.items.add(f));
-                    document.getElementById('imageInput').files = dt.files;
-                    handleImageUpload({ target: { files: dt.files, value: '' } });
-                }
-            });
-        }
-
-        // ==================== 儲存宣導事項 ====================
-        async function saveAnnouncement() {
-            const id = document.getElementById('formId').value;
-            const subject = document.getElementById('formSubject').value.trim();
-            const category = document.getElementById('formCategory').value;
-            const content = document.getElementById('formContent').value.trim();
-            const status = document.getElementById('formStatus').value;
-            const videoUrl = document.getElementById('formVideoUrl').value.trim();
-
-            if (!subject) {
-                showToast('請輸入宣導事項主旨', 'error');
-                return;
-            }
-            if (!category) {
-                showToast('請選擇分類項目', 'error');
-                return;
-            }
-            if (!content) {
-                showToast('請輸入主體內容', 'error');
-                return;
-            }
-
-            const existingUrls = existingImagesList.join('||');
-            const deletedUrls = deletedImagesList.join('||');
-
-            const payload = {
-                id: id,
-                subject: subject,
-                category: category,
-                content: content,
-                status: status,
-                videoUrl: videoUrl,
-                existingImages: existingUrls,
-                deletedImages: deletedUrls,
-                newImages: newImagesToUpload
-            };
-
-            const saveBtn = document.querySelector('#announcementModal .btn-custom-primary');
-            const originalHtml = saveBtn.innerHTML;
-            saveBtn.innerHTML = '<span class="loading-spinner"></span> 儲存中...';
-            saveBtn.disabled = true;
-
-            const result = await callGAS('saveAnnouncement', { payload });
-
-            saveBtn.innerHTML = originalHtml;
-            saveBtn.disabled = false;
-
-            if (result.success) {
-                showToast(result.message || '儲存成功！', 'success');
-                announcementModal.hide();
-                loadAllData();
-            } else {
-                showToast(result.message || '儲存失敗', 'error');
-            }
-        }
-
-        // ==================== 刪除宣導事項 ====================
-        async function deleteAnnouncement(id) {
-            if (!confirm('確定要刪除這則宣導事項嗎？此操作無法復原。')) return;
-
-            const result = await callGAS('deleteAnnouncement', { id });
-            if (result.success) {
-                showToast('刪除成功！', 'success');
-                loadAllData();
-            } else {
-                showToast(result.message || '刪除失敗', 'error');
-            }
-        }
-
-        // ==================== 查看詳情 (極貼合圖文連續感) ====================
+        // ==================== 詳情 Modal ====================
         function openDetailModal(id) {
             const item = allAnnouncements.find(a => a.id === id);
-            if (!item) return;
-
-            const images = item.imageUrls ? item.imageUrls.split('||').filter(u => u.trim() !== '') : [];
-            const dateStr = formatDate(item.createdAt);
+            if(!item) return;
+            const subj = currentLang === 'en' && item.subjectEn ? item.subjectEn : item.subject;
+            const cont = escapeHtml(currentLang === 'en' && item.contentEn ? item.contentEn : item.content);
+            const images = item.imageUrls ? item.imageUrls.split('||').filter(u=>u) : [];
             const catColor = getCategoryColor(item.category);
-
+            
             const usedImageIndices = new Set();
-            let rawContent = escapeHtml(item.content || '');
-
-            // 替換 [圖1]、[圖2] 等標籤，採用極緊湊內聯塊 (無過度大外距)
-            let formattedContent = rawContent.replace(/\[(?:圖|img|photo)(\d+)\]/gi, function(match, p1) {
-                const index = parseInt(p1, 10) - 1;
-                if (index >= 0 && index < images.length) {
-                    usedImageIndices.add(index);
-                    const directUrl = getDirectImageUrl(images[index]);
-                    return `<span class="detail-inline-image-wrapper"><span class="detail-inline-image-card d-inline-block position-relative rounded-2 overflow-hidden shadow-sm" onclick="openLightbox('${directUrl}')" title="點擊放大觀看"><img src="${directUrl}" class="img-fluid rounded-2" style="max-height: 320px; object-fit: contain; cursor: pointer; vertical-align: bottom;" alt="照片 ${p1}"><span class="zoom-overlay"><i class="bi bi-zoom-in me-1"></i> 點擊放大</span></span><span class="d-block text-muted" style="font-size: 0.78rem; line-height: 1.2; margin-top: 2px;">圖 ${p1}</span></span>`;
+            let formattedContent = cont.replace(/\[(?:圖|img|photo)(\d+)\]/gi, (match, p1) => {
+                const idx = parseInt(p1, 10) - 1;
+                if(idx >= 0 && idx < images.length) {
+                    usedImageIndices.add(idx);
+                    const url = getDirectImageUrl(images[idx]);
+                    return `<span class="detail-inline-image-wrapper"><img src="${url}" class="detail-inline-image-card img-fluid rounded-2 shadow-sm" style="max-height:320px; object-fit:contain;" onclick="openLightbox('${url}')"></span>`;
                 }
                 return match;
             });
 
-            // 未插在文字中間的照片排至底部
-            const remainingImages = images.filter((_, idx) => !usedImageIndices.has(idx));
-            let remainingImagesHtml = '';
-
-            if (remainingImages.length > 0) {
-                remainingImagesHtml = `
-                    <hr class="my-3">
-                    <h6 class="fw-bold mb-2"><i class="bi bi-images me-1"></i>照片 (點擊可放大觀看)</h6>
-                    <div class="detail-image-gallery">
-                `;
-                remainingImages.forEach(function(url) {
-                    const directUrl = getDirectImageUrl(url);
-                    remainingImagesHtml += `
-                        <div class="detail-image-card" onclick="openLightbox('${directUrl}')" title="點擊放大觀看">
-                            <img src="${directUrl}" alt="圖片" onerror="this.parentElement.style.display='none';">
-                            <div class="zoom-overlay"><i class="bi bi-zoom-in"></i></div>
-                        </div>
-                    `;
-                });
-                remainingImagesHtml += '</div>';
+            const remainingImgs = images.filter((_, idx) => !usedImageIndices.has(idx));
+            let remainHtml = '';
+            if(remainingImgs.length > 0) {
+                remainHtml = '<hr class="my-3"><div class="detail-image-gallery">' + 
+                    remainingImgs.map(u => `<div class="detail-image-card" onclick="openLightbox('${getDirectImageUrl(u)}')"><img src="${getDirectImageUrl(u)}"></div>`).join('') + '</div>';
             }
-
-            let videoHtml = '';
-            if (item.videoUrl) {
+            
+            let vidHtml = '';
+            if(item.videoUrl) {
                 const embedUrl = getEmbedUrl(item.videoUrl);
-                if (embedUrl) {
-                    videoHtml = `
-                        <div class="video-container mt-3">
-                            <iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                        </div>
-                    `;
-                } else {
-                    videoHtml =
-                        `<p class="mt-2"><a href="${escapeHtml(item.videoUrl)}" target="_blank"><i class="bi bi-link-45deg me-1"></i>觀看影片連結</a></p>`;
-                }
+                vidHtml = embedUrl ? `<div class="video-container mt-3"><iframe src="${embedUrl}" allowfullscreen></iframe></div>` 
+                                   : `<p class="mt-3"><a href="${item.videoUrl}" target="_blank"><i class="bi bi-youtube me-1"></i> Video Link</a></p>`;
             }
 
-            const detailHtml = `
-                <div class="d-flex align-items-center gap-2 mb-3">
-                    <span class="category-badge" style="background:${catColor}20;color:${catColor};border:1px solid ${catColor}40;">
-                        ${escapeHtml(item.category)}
-                    </span>
-                    <span class="category-badge" style="background:rgba(255,255,255,0.9);color:#333;border:1px solid #ddd;">
-                        <span class="status-dot ${item.status === '已發布' ? 'published' : 'draft'}"></span>${escapeHtml(item.status)}
-                    </span>
-                    <span class="text-muted ms-auto" style="font-size:0.85rem;">
-                        <i class="bi bi-calendar3 me-1"></i>${dateStr}
-                    </span>
-                </div>
-                <h4 class="fw-bold mb-3">${escapeHtml(item.subject)}</h4>
-                <div class="mb-3" style="white-space:pre-wrap;line-height:1.7;">${formattedContent}</div>
-                ${remainingImagesHtml}
-                ${videoHtml ? `<h6 class="fw-bold mt-4 mb-2"><i class="bi bi-play-circle me-1"></i>影片</h6>${videoHtml}` : ''}
+            document.getElementById('detailBody').innerHTML = `
+                <span class="category-badge mb-3" style="background:${catColor}20;color:${catColor};">${item.category}</span>
+                <h4 class="fw-bold mb-3">${subj}</h4>
+                <div style="white-space:pre-wrap; line-height:1.7;">${formattedContent}</div>
+                ${remainHtml} ${vidHtml}
             `;
-
-            document.getElementById('detailBody').innerHTML = detailHtml;
-            detailModal.show();
+            new bootstrap.Modal(document.getElementById('detailModal')).show();
         }
 
-        // ==================== 開啟圖片燈箱放大 ====================
-        function openLightbox(imageUrl) {
-            document.getElementById('lightboxImage').src = imageUrl;
-            lightboxModal.show();
+        // ==================== 表單與上傳 ====================
+        let annModal;
+        function openAddModal() {
+            if(!annModal) annModal = new bootstrap.Modal(document.getElementById('announcementModal'));
+            document.getElementById('formId').value = '';
+            document.getElementById('formSubject').value = ''; document.getElementById('formSubjectEn').value = '';
+            document.getElementById('formContent').value = ''; document.getElementById('formContentEn').value = '';
+            document.getElementById('formVideoUrl').value = '';
+            newImagesToUpload = []; existingImagesList = []; deletedImagesList = [];
+            renderImagePreviews();
+            annModal.show();
         }
 
-        // ==================== 取得嵌入URL ====================
-        function getEmbedUrl(url) {
-            if (!url) return '';
-            const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/);
-            if (ytMatch) {
-                return 'https://www.youtube.com/embed/' + ytMatch[1];
-            }
-            const driveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
-            if (driveMatch) {
-                return 'https://drive.google.com/file/d/' + driveMatch[1] + '/preview';
-            }
-            const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
-            if (vimeoMatch) {
-                return 'https://player.vimeo.com/video/' + vimeoMatch[1];
-            }
-            if (url.includes('/embed/') || url.includes('/preview')) {
-                return url;
-            }
-            return '';
+        function openEditModal(id) {
+            const item = allAnnouncements.find(a => a.id === id);
+            if(!annModal) annModal = new bootstrap.Modal(document.getElementById('announcementModal'));
+            document.getElementById('formId').value = item.id;
+            document.getElementById('formSubject').value = item.subject || '';
+            document.getElementById('formSubjectEn').value = item.subjectEn || '';
+            document.getElementById('formContent').value = item.content || '';
+            document.getElementById('formContentEn').value = item.contentEn || '';
+            document.getElementById('formCategory').value = item.category || '';
+            document.getElementById('formStatus').value = item.status || '已發布';
+            document.getElementById('formVideoUrl').value = item.videoUrl || '';
+            
+            existingImagesList = item.imageUrls ? item.imageUrls.split('||').filter(u=>u) : [];
+            newImagesToUpload = []; deletedImagesList = [];
+            renderImagePreviews();
+            annModal.show();
+        }
+
+        async function saveAnnouncement() {
+            const payload = {
+                id: document.getElementById('formId').value,
+                subject: document.getElementById('formSubject').value,
+                subjectEn: document.getElementById('formSubjectEn').value,
+                content: document.getElementById('formContent').value,
+                contentEn: document.getElementById('formContentEn').value,
+                category: document.getElementById('formCategory').value,
+                status: document.getElementById('formStatus').value,
+                videoUrl: document.getElementById('formVideoUrl').value,
+                existingImages: existingImagesList.join('||'),
+                deletedImages: deletedImagesList.join('||'),
+                newImages: newImagesToUpload
+            };
+            if(!payload.subject || !payload.content) return showToast('中文主旨與內文為必填', 'error');
+            
+            const res = await callGAS('saveAnnouncement', { payload });
+            if(res.success) { showToast('儲存成功', 'success'); annModal.hide(); loadAllData(); }
+            else showToast(res.message, 'error');
+        }
+
+        async function deleteAnnouncement(id) {
+            if(!confirm(currentLang==='zh'?'確定刪除？':'Confirm delete?')) return;
+            const res = await callGAS('deleteAnnouncement', { id });
+            if(res.success) { showToast('刪除成功', 'success'); loadAllData(); }
+            else showToast(res.message, 'error');
+        }
+
+        // ==================== 圖片處理邏輯 ====================
+        function handleImageUpload(e) {
+            const files = e.target.files;
+            if(!files || !files.length) return;
+            if(existingImagesList.length + newImagesToUpload.length + files.length > 10) return showToast('最多 10 張圖片', 'error');
+            Array.from(files).forEach(f => {
+                if(!f.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = e => { newImagesToUpload.push(e.target.result); renderImagePreviews(); };
+                reader.readAsDataURL(f);
+            });
+            e.target.value = '';
+        }
+
+        function renderImagePreviews() {
+            const c = document.getElementById('imagePreviewContainer');
+            let html = existingImagesList.map((url, i) => `<div class="image-preview-item"><img src="${getDirectImageUrl(url)}"><button class="remove-image" onclick="removeExistImg(${i})"><i class="bi bi-x"></i></button></div>`).join('');
+            html += newImagesToUpload.map((data, i) => `<div class="image-preview-item"><img src="${data}"><button class="remove-image" onclick="removeNewImg(${i})"><i class="bi bi-x"></i></button></div>`).join('');
+            c.innerHTML = html;
+        }
+
+        function removeExistImg(i) { deletedImagesList.push(existingImagesList.splice(i,1)[0]); renderImagePreviews(); }
+        function removeNewImg(i) { newImagesToUpload.splice(i,1); renderImagePreviews(); }
+
+        function setupDragDrop() {
+            const area = document.getElementById('uploadArea');
+            if(!area) return;
+            area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('dragover'); });
+            area.addEventListener('dragleave', e => { e.preventDefault(); area.classList.remove('dragover'); });
+            area.addEventListener('drop', e => {
+                e.preventDefault(); area.classList.remove('dragover');
+                const dt = new DataTransfer();
+                Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
+                handleImageUpload({ target: { files: dt.files } });
+            });
         }
 
         // ==================== 分類管理 ====================
+        let catModal;
         function openCategoryModal() {
-            renderCategoryList();
-            document.getElementById('newCategoryName').value = '';
-            categoryModal.show();
+            if(!catModal) catModal = new bootstrap.Modal(document.getElementById('categoryModal'));
+            renderCategoryManager();
+            catModal.show();
+        }
+
+        function renderCategoryManager() {
+            const container = document.getElementById('categoryList');
+            container.innerHTML = allCategories.map((c, i) => `
+                <div class="category-list-item">
+                    <span class="fw-bold"><span class="status-dot" style="background:${colorPalette[i%colorPalette.length]}"></span>${escapeHtml(c.name)}</span>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-2" onclick="editCat('${escapeHtml(c.name)}')"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger rounded-pill px-2" onclick="deleteCat('${escapeHtml(c.name)}')"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         async function addCategory() {
-            const name = document.getElementById('newCategoryName').value.trim();
-            if (!name) {
-                showToast('請輸入分類名稱', 'error');
-                return;
-            }
-            if (allCategories.some(c => c.name === name)) {
-                showToast('分類「' + name + '」已存在', 'error');
-                return;
-            }
-
-            const result = await callGAS('addCategory', { name });
-            if (result.success) {
-                showToast('分類新增成功！', 'success');
-                document.getElementById('newCategoryName').value = '';
-                loadAllData();
-                renderCategoryList();
-            } else {
-                showToast(result.message || '新增失敗', 'error');
-            }
+            const n = document.getElementById('newCategoryName').value.trim();
+            if(!n) return;
+            const res = await callGAS('addCategory', { name: n });
+            if(res.success) { document.getElementById('newCategoryName').value=''; loadAllData().then(renderCategoryManager); }
+            else showToast(res.message, 'error');
         }
 
-        async function editCategory(oldName, index) {
-            const newName = prompt('修改分類名稱：', oldName);
-            if (!newName || newName.trim() === '' || newName.trim() === oldName) return;
-            const trimmedNewName = newName.trim();
-
-            if (allCategories.some(c => c.name === trimmedNewName)) {
-                showToast('分類「' + trimmedNewName + '」已存在', 'error');
-                return;
-            }
-
-            const result = await callGAS('updateCategory', { oldName, newName: trimmedNewName });
-            if (result.success) {
-                showToast('分類修改成功！', 'success');
-                loadAllData();
-                renderCategoryList();
-            } else {
-                showToast(result.message || '修改失敗', 'error');
-            }
+        async function editCat(oldN) {
+            const newN = prompt('輸入新名稱:', oldN);
+            if(!newN || newN===oldN) return;
+            const res = await callGAS('updateCategory', { oldName: oldN, newName: newN });
+            if(res.success) loadAllData().then(renderCategoryManager);
         }
 
-        async function deleteCategory(catName) {
-            const count = allAnnouncements.filter(a => a.category === catName).length;
-            const msg = count > 0 ?
-                `分類「${catName}」下有 ${count} 則宣導事項。刪除後這些宣導事項將變為無分類。確定要刪除嗎？` :
-                `確定要刪除分類「${catName}」嗎？`;
-            if (!confirm(msg)) return;
-
-            const result = await callGAS('deleteCategory', { name: catName });
-            if (result.success) {
-                showToast('分類刪除成功！', 'success');
-                loadAllData();
-                renderCategoryList();
-            } else {
-                showToast(result.message || '刪除失敗', 'error');
-            }
+        async function deleteCat(n) {
+            if(!confirm('確認刪除分類?')) return;
+            const res = await callGAS('deleteCategory', { name: n });
+            if(res.success) loadAllData().then(renderCategoryManager);
         }
 
-        // ==================== 工具函數 ====================
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        // ==================== 輔助工具 ====================
+        function escapeHtml(text) { const div=document.createElement('div'); div.textContent=text; return div.innerHTML; }
+        function getDirectImageUrl(url) {
+            if(!url) return '';
+            let fileId = url.match(/[?&]id=([^&]+)/) ? url.match(/[?&]id=([^&]+)/)[1] : (url.match(/\/file\/d\/([^\/]+)/) ? url.match(/\/file\/d\/([^\/]+)/)[1] : null);
+            return fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w1600` : url;
         }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return '未知日期';
-            const d = new Date(dateStr);
-            if (isNaN(d.getTime())) return dateStr;
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}/${month}/${day}`;
+        function getEmbedUrl(url) {
+            if(!url) return '';
+            const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+            if(yt) return `https://www.youtube.com/embed/${yt[1]}`;
+            const drive = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if(drive) return `https://drive.google.com/file/d/${drive[1]}/preview`;
+            return '';
         }
-
-        function showToast(message, type) {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = 'toast-custom ' + (type === 'error' ? 'error' : '');
-            toast.innerHTML = `
-                ${type === 'error' ? 
-                    '<i class="bi bi-x-circle-fill toast-icon-error"></i>' : 
-                    '<i class="bi bi-check-circle-fill toast-icon-success"></i>'}
-                <span>${escapeHtml(message)}</span>
-            `;
-            container.appendChild(toast);
-            setTimeout(function() {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                toast.style.transition = 'all 0.4s ease';
-                setTimeout(function() {
-                    toast.remove();
-                }, 400);
-            }, 3000);
+        function openLightbox(url) { document.getElementById('lightboxImage').src = url; new bootstrap.Modal(document.getElementById('lightboxModal')).show(); }
+        function showToast(msg, type) {
+            const t = document.createElement('div');
+            t.className = `toast-custom ${type==='error'?'error':''}`;
+            t.innerHTML = `<i class="bi ${type==='error'?'bi-x-circle-fill':'bi-check-circle-fill'}"></i> <span>${msg}</span>`;
+            document.getElementById('toastContainer').appendChild(t);
+            setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, 3000);
         }
     </script>
 </body>
