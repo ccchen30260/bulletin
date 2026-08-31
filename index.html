@@ -490,7 +490,13 @@
             border: none;
         }
 
-        /* 詳情內文與嵌入照片樣式 */
+        /* 詳情內文與嵌入照片樣式 (高緊密連續感) */
+        .detail-inline-image-wrapper {
+            display: block;
+            text-align: center;
+            margin: 6px 0;
+            padding: 2px 0;
+        }
         .detail-inline-image-card {
             cursor: pointer;
             transition: var(--transition);
@@ -499,7 +505,7 @@
         }
         .detail-inline-image-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important;
         }
         .detail-inline-image-card .zoom-overlay {
             position: absolute;
@@ -509,7 +515,7 @@
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 600;
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -656,7 +662,7 @@
                             <div class="col-12">
                                 <label class="form-label" for="formContent">主體內容 <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="formContent" rows="6" placeholder="輸入宣導事項的詳細內容..." required></textarea>
-                                <small class="text-muted mt-1 d-block"><i class="bi bi-info-circle me-1"></i>提示：若要在內文中插入對應照片，可在內文中輸入 <b>[圖1]</b>、<b>[圖2]</b> 等標籤，系統將自動將第 1 張、第 2 張照片放置於該文字位置。</small>
+                                <small class="text-muted mt-1 d-block"><i class="bi bi-info-circle me-1"></i>提示：可在內文中輸入 <b>[圖1]</b>、<b>[圖2]</b> 標籤，照片將緊密插入該段文字中。</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="formStatus">狀態</label>
@@ -1199,7 +1205,7 @@
             }
         }
 
-        // ==================== 查看詳情 (圖文並茂解析) ====================
+        // ==================== 查看詳情 (極貼合圖文連續感) ====================
         function openDetailModal(id) {
             const item = allAnnouncements.find(a => a.id === id);
             if (!item) return;
@@ -1211,21 +1217,13 @@
             const usedImageIndices = new Set();
             let rawContent = escapeHtml(item.content || '');
 
-            // 解析 [圖1]、[圖2]、[photo1] 混排相片
+            // 替換 [圖1]、[圖2] 等標籤，採用極緊湊內聯塊 (無過度大外距)
             let formattedContent = rawContent.replace(/\[(?:圖|img|photo)(\d+)\]/gi, function(match, p1) {
                 const index = parseInt(p1, 10) - 1;
                 if (index >= 0 && index < images.length) {
                     usedImageIndices.add(index);
                     const directUrl = getDirectImageUrl(images[index]);
-                    return `
-                        <div class="my-3 text-center">
-                            <div class="detail-inline-image-card d-inline-block position-relative rounded-3 overflow-hidden shadow-sm" onclick="openLightbox('${directUrl}')" title="點擊放大觀看">
-                                <img src="${directUrl}" class="img-fluid rounded-3" style="max-height: 380px; object-fit: contain; cursor: pointer;" alt="照片 ${p1}">
-                                <div class="zoom-overlay"><i class="bi bi-zoom-in me-1"></i> 點擊放大</div>
-                            </div>
-                            <div class="small text-muted mt-1">圖 ${p1}</div>
-                        </div>
-                    `;
+                    return `<span class="detail-inline-image-wrapper"><span class="detail-inline-image-card d-inline-block position-relative rounded-2 overflow-hidden shadow-sm" onclick="openLightbox('${directUrl}')" title="點擊放大觀看"><img src="${directUrl}" class="img-fluid rounded-2" style="max-height: 320px; object-fit: contain; cursor: pointer; vertical-align: bottom;" alt="照片 ${p1}"><span class="zoom-overlay"><i class="bi bi-zoom-in me-1"></i> 點擊放大</span></span><span class="d-block text-muted" style="font-size: 0.78rem; line-height: 1.2; margin-top: 2px;">圖 ${p1}</span></span>`;
                 }
                 return match;
             });
@@ -1236,7 +1234,7 @@
 
             if (remainingImages.length > 0) {
                 remainingImagesHtml = `
-                    <hr>
+                    <hr class="my-3">
                     <h6 class="fw-bold mb-2"><i class="bi bi-images me-1"></i>照片 (點擊可放大觀看)</h6>
                     <div class="detail-image-gallery">
                 `;
@@ -1280,7 +1278,7 @@
                     </span>
                 </div>
                 <h4 class="fw-bold mb-3">${escapeHtml(item.subject)}</h4>
-                <div class="mb-3" style="white-space:pre-wrap;line-height:1.8;">${formattedContent}</div>
+                <div class="mb-3" style="white-space:pre-wrap;line-height:1.7;">${formattedContent}</div>
                 ${remainingImagesHtml}
                 ${videoHtml ? `<h6 class="fw-bold mt-4 mb-2"><i class="bi bi-play-circle me-1"></i>影片</h6>${videoHtml}` : ''}
             `;
