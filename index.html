@@ -254,11 +254,16 @@
         </div>
     </div>
 
-    <!-- 詳情 Modal -->
+    <!-- 詳情 Modal（加入語言切換按鈕） -->
     <div class="modal fade" id="detailModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill" id="detailLangToggle" onclick="toggleLanguage()">
+                        <i class="bi bi-translate"></i> <span id="detailLangBtnText">EN</span>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body" id="detailBody"></div>
             </div>
         </div>
@@ -281,7 +286,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ==================== 全局配置 ====================
-        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxli627zwJ9lZN3LLpu-D1nN2bsi6mAF8xkKFF7YDk3DGHxQ859rtboPD78EqNJFLo3/exec'; // <--- 請替換為您的網址
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzbhDuokshwZrBEUsNn5XAj6hvdcdAO_0RWNOdQtd9yivmG-KW01fZXQcRdiBOmM7cd/exec'; // <--- 請替換為您的網址
         
         let allAnnouncements = [], allCategories = [];
         let newImagesToUpload = [], existingImagesList = [], deletedImagesList = [];
@@ -289,6 +294,7 @@
         let currentLang = 'zh';     
         let adminToken = '';        
         let colorPalette = ['#2c6e9b', '#4a9e6b', '#8e44ad', '#e67e22', '#c0392b', '#16a085', '#d35400', '#2980b9'];
+        let currentDetailId = null; // 記錄目前開啟的詳情 ID
 
         // 僅保留需要雙語切換的前台文字
         const i18n = {
@@ -313,8 +319,13 @@
             if (currentRole === 'admin') return; // 管理員不可切換
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
+            document.getElementById('detailLangBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
             applyLanguage();
             if(allAnnouncements.length > 0) filterAnnouncements();
+            // 如果詳情視窗開啟，重新載入內容
+            if (currentDetailId) {
+                openDetailModal(currentDetailId);
+            }
         }
 
         function applyLanguage() {
@@ -333,13 +344,15 @@
             // 管理員模式強制使用中文
             if (role === 'admin') {
                 currentLang = 'zh';
-                document.getElementById('langBtnText').innerText = 'EN'; // 按鈕文字恢復為 "EN"（雖然按鈕被隱藏）
+                document.getElementById('langBtnText').innerText = 'EN';
+                document.getElementById('detailLangBtnText').innerText = 'EN';
             }
 
             // 語言切換按鈕僅訪客可見
             document.getElementById('langToggleBtn').style.display = role === 'viewer' ? 'inline-block' : 'none';
+            document.getElementById('detailLangToggle').style.display = role === 'viewer' ? 'inline-block' : 'none';
 
-            // 管理員專用按鈕顯示控制（原邏輯不變）
+            // 管理員專用按鈕顯示控制
             document.querySelectorAll('.admin-only').forEach(el => {
                 el.style.display = role === 'admin' ? (el.tagName==='BUTTON'||el.tagName==='DIV'?'inline-block':'block') : 'none';
             });
@@ -473,6 +486,7 @@
 
         // ==================== 詳情 Modal ====================
         function openDetailModal(id) {
+            currentDetailId = id;
             const item = allAnnouncements.find(a => a.id === id);
             if(!item) return;
             const useEnglish = currentLang === 'en' && currentRole !== 'admin';
