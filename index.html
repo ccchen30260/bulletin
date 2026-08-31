@@ -69,7 +69,7 @@
 </head>
 <body>
 
-    <!-- 登入畫面 -->
+    <!-- 登入畫面 (雙語) -->
     <div id="loginOverlay">
         <div class="login-card">
             <h3 class="fw-bold mb-4" data-i18n="sys_title">宣導事項管理系統</h3>
@@ -82,7 +82,7 @@
         </div>
     </div>
 
-    <!-- 頂部導航欄 -->
+    <!-- 頂部導航欄 (雙語 / 管理功能全中文) -->
     <nav class="navbar-custom">
         <div class="container">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 w-100">
@@ -93,11 +93,12 @@
                     <button class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" onclick="toggleLanguage()">
                         <i class="bi bi-translate"></i> <span id="langBtnText">EN</span>
                     </button>
+                    <!-- 管理員介面純中文 -->
                     <button class="btn btn-sm btn-outline-primary rounded-pill admin-only" onclick="openCategoryModal()" style="display:none;">
-                        <i class="bi bi-tags me-1"></i><span data-i18n="manage_categories">管理分類</span>
+                        <i class="bi bi-tags me-1"></i>管理分類
                     </button>
                     <button class="btn btn-sm btn-outline-dark rounded-pill admin-only" onclick="openPwdModal()" style="display:none;">
-                        <i class="bi bi-key me-1"></i><span data-i18n="change_pwd">變更密碼</span>
+                        <i class="bi bi-key me-1"></i>變更密碼
                     </button>
                     <span class="badge bg-secondary rounded-pill px-3 py-2" id="roleBadge">Guest</span>
                 </div>
@@ -122,7 +123,7 @@
                 </div>
                 <div class="col-lg-2 text-end admin-only" style="display:none;">
                     <button class="btn btn-custom-primary w-100" onclick="openAddModal()">
-                        <i class="bi bi-plus-lg me-1"></i><span data-i18n="add_announcement">新增宣導</span>
+                        <i class="bi bi-plus-lg me-1"></i>新增宣導
                     </button>
                 </div>
             </div>
@@ -135,12 +136,12 @@
         </div>
     </div>
 
-    <!-- 新增/編輯宣導事項模態框 -->
+    <!-- 新增/編輯宣導事項模態框 (全中文介面，保留中英文輸入框) -->
     <div class="modal fade" id="announcementModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" data-i18n="edit_announcement">編輯宣導事項</h5>
+                    <h5 class="modal-title">編輯宣導事項</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -148,11 +149,11 @@
                     
                     <ul class="nav nav-tabs mb-3" role="tablist">
                         <li class="nav-item"><button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#zh-pane" type="button">中文內容</button></li>
-                        <li class="nav-item"><button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#en-pane" type="button">English Content</button></li>
+                        <li class="nav-item"><button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#en-pane" type="button">英文內容</button></li>
                     </ul>
 
                     <div class="tab-content">
-                        <!-- 中文 -->
+                        <!-- 中文輸入 -->
                         <div class="tab-pane fade show active" id="zh-pane">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">主旨 (中文) <span class="text-danger">*</span></label>
@@ -163,14 +164,14 @@
                                 <textarea class="form-control" id="formContent" rows="5" placeholder="可輸入 [圖1] 將照片插在文字中" required></textarea>
                             </div>
                         </div>
-                        <!-- 英文 -->
+                        <!-- 英文輸入 -->
                         <div class="tab-pane fade" id="en-pane">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Subject (English)</label>
+                                <label class="form-label fw-bold">主旨 (英文)</label>
                                 <input type="text" class="form-control" id="formSubjectEn">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Content (English)</label>
+                                <label class="form-label fw-bold">內文 (英文)</label>
                                 <textarea class="form-control" id="formContentEn" rows="5" placeholder="Use [img1] to insert photos"></textarea>
                             </div>
                         </div>
@@ -178,11 +179,11 @@
 
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label fw-bold" data-i18n="category">分類</label>
+                            <label class="form-label fw-bold">分類 (管理標籤)</label>
                             <select class="form-select" id="formCategory" required></select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold" data-i18n="status">狀態</label>
+                            <label class="form-label fw-bold">狀態</label>
                             <select class="form-select" id="formStatus">
                                 <option value="已發布">已發布</option>
                                 <option value="草稿">草稿</option>
@@ -193,10 +194,10 @@
                             <input type="url" class="form-control" id="formVideoUrl">
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-bold" data-i18n="upload_images">上傳圖片</label>
+                            <label class="form-label fw-bold">上傳圖片</label>
                             <div class="upload-area" id="uploadArea" onclick="document.getElementById('imageInput').click()">
                                 <i class="bi bi-cloud-arrow-up"></i>
-                                <p class="mb-0 text-muted" data-i18n="upload_hint">點擊選擇圖片，或拖曳圖片到此處</p>
+                                <p class="mb-0 text-muted">點擊選擇圖片，或拖曳圖片到此處</p>
                             </div>
                             <input type="file" id="imageInput" accept="image/*" multiple style="display:none;" onchange="handleImageUpload(event)">
                             <div class="mt-2" id="imagePreviewContainer"></div>
@@ -206,44 +207,45 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal" data-i18n="cancel">取消</button>
-                    <button type="button" class="btn btn-custom-primary" onclick="saveAnnouncement()" data-i18n="save">儲存</button>
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-custom-primary" onclick="saveAnnouncement()">儲存</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 變更密碼模態框 -->
+    <!-- 變更密碼模態框 (全中文介面) -->
     <div class="modal fade" id="pwdModal" tabindex="-1">
         <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h6 class="modal-title fw-bold" data-i18n="change_pwd">變更密碼</h6>
+                    <h6 class="modal-title fw-bold">變更管理員密碼</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="password" id="oldPwd" class="form-control mb-2" data-i18n-placeholder="old_pwd">
-                    <input type="password" id="newPwd" class="form-control" data-i18n-placeholder="new_pwd">
+                    <input type="password" id="oldPwd" class="form-control mb-2" placeholder="舊密碼">
+                    <input type="password" id="newPwd" class="form-control" placeholder="新密碼">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-custom-primary w-100" onclick="submitChangePwd()" data-i18n="save">儲存</button>
+                    <button type="button" class="btn btn-custom-primary w-100" onclick="submitChangePwd()">儲存</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 分類管理模態框 -->
+    <!-- 分類管理模態框 (全中文介面) -->
     <div class="modal fade" id="categoryModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-tags me-2"></i><span data-i18n="manage_categories">管理分類</span></h5>
+                    <h5 class="modal-title"><i class="bi bi-tags me-2"></i>管理分類</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex gap-2 mb-3">
-                        <input type="text" class="form-control" id="newCategoryName" onkeydown="if(event.key==='Enter')addCategory()">
-                        <button class="btn btn-custom-primary text-nowrap" onclick="addCategory()"><i class="bi bi-plus-lg me-1"></i><span data-i18n="save">儲存</span></button>
+                        <input type="text" class="form-control" id="newCategoryName" placeholder="中文名稱">
+                        <input type="text" class="form-control" id="newCategoryNameEn" placeholder="英文名稱 (選填)" onkeydown="if(event.key==='Enter')addCategory()">
+                        <button class="btn btn-custom-primary text-nowrap" onclick="addCategory()"><i class="bi bi-plus-lg me-1"></i>新增</button>
                     </div>
                     <div id="categoryList"></div>
                 </div>
@@ -278,7 +280,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ==================== 全局配置 ====================
-        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzzRX66BNW16sQ_sCNSif6ES-2fkrrEgT_RaEF7dBdhoyvoYsPmnXI1fYSotYV2_trf/exec';
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzzRX66BNW16sQ_sCNSif6ES-2fkrrEgT_RaEF7dBdhoyvoYsPmnXI1fYSotYV2_trf/exec'; // <--- 請替換為您的網址
         
         let allAnnouncements = [], allCategories = [];
         let newImagesToUpload = [], existingImagesList = [], deletedImagesList = [];
@@ -287,9 +289,10 @@
         let adminToken = '';        
         let colorPalette = ['#2c6e9b', '#4a9e6b', '#8e44ad', '#e67e22', '#c0392b', '#16a085', '#d35400', '#2980b9'];
 
+        // 僅保留需要雙語切換的前台文字
         const i18n = {
-            zh: { sys_title: "宣導事項管理系統", guest_view: "進入觀看 (Guest View)", admin_login: "管理員登入", pwd_placeholder: "請輸入密碼", login_btn: "登入", manage_categories: "管理分類", change_pwd: "變更密碼", search_placeholder: "搜尋主旨或內容...", all_categories: "全部分類", add_announcement: "新增宣導", no_data: "尚無資料", edit_announcement: "編輯宣導", category: "分類", status: "狀態", cancel: "取消", save: "儲存", old_pwd: "舊密碼", new_pwd: "新密碼", role_admin: "管理員", role_guest: "一般訪客", upload_images: "上傳圖片", upload_hint: "點擊選擇圖片，或拖曳圖片到此處" },
-            en: { sys_title: "Announcement System", guest_view: "Continue as Guest", admin_login: "Admin Login", pwd_placeholder: "Enter Password", login_btn: "Login", manage_categories: "Categories", change_pwd: "Password", search_placeholder: "Search...", all_categories: "All Categories", add_announcement: "Add New", no_data: "No Data Available", edit_announcement: "Edit", category: "Category", status: "Status", cancel: "Cancel", save: "Save", old_pwd: "Old Password", new_pwd: "New Password", role_admin: "Admin", role_guest: "Guest", upload_images: "Upload Images", upload_hint: "Click or drag images here" }
+            zh: { sys_title: "宣導事項管理系統", guest_view: "進入觀看 (Guest View)", admin_login: "管理員登入", pwd_placeholder: "請輸入密碼", login_btn: "登入", search_placeholder: "搜尋主旨或內容...", all_categories: "全部分類", no_data: "尚無資料", role_admin: "管理員", role_guest: "一般訪客", status_published: "已發布", status_draft: "草稿" },
+            en: { sys_title: "Announcement System", guest_view: "Continue as Guest", admin_login: "Admin Login", pwd_placeholder: "Enter Password", login_btn: "Login", search_placeholder: "Search...", all_categories: "All Categories", no_data: "No Data Available", role_admin: "Admin", role_guest: "Guest", status_published: "Published", status_draft: "Draft" }
         };
 
         // ==================== 初始化與通訊 ====================
@@ -317,7 +320,7 @@
             document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = dict[el.getAttribute('data-i18n')] || el.innerText);
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = dict[el.getAttribute('data-i18n-placeholder')] || el.placeholder);
             document.getElementById('roleBadge').innerText = currentRole === 'admin' ? dict.role_admin : dict.role_guest;
-            renderCategoryFilter();
+            renderCategoryFilter(); // 前台篩選器重新渲染以切換英文分類名
         }
 
         function setRole(role, pwd = '') {
@@ -325,7 +328,6 @@
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             
-            const displayStyle = role === 'admin' ? '' : 'none';
             document.querySelectorAll('.admin-only').forEach(el => {
                 el.style.display = role === 'admin' ? (el.tagName==='BUTTON'||el.tagName==='DIV'?'inline-block':'block') : 'none';
             });
@@ -355,13 +357,14 @@
             new bootstrap.Modal(document.getElementById('pwdModal')).show(); 
         }
 
-        // ==================== 讀取與渲染 ====================
+        // ==================== 讀取與前台渲染 ====================
         async function loadAllData() {
             const data = await callGAS('getAllData');
             if (data.categories) {
                 allAnnouncements = data.announcements || [];
                 allCategories = data.categories || [];
                 renderCategoryFilter();
+                renderAdminFormCategory();
                 filterAnnouncements();
             }
         }
@@ -371,15 +374,22 @@
             return idx >= 0 ? colorPalette[idx % colorPalette.length] : '#2c6e9b';
         }
 
+        // 前台篩選器 (依語言顯示)
         function renderCategoryFilter() {
             const select = document.getElementById('categoryFilter');
-            const formSelect = document.getElementById('formCategory');
             const currentFilter = select.value;
-            
-            let catHtml = allCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            let catHtml = allCategories.map(c => {
+                const displayName = currentLang === 'en' && c.nameEn ? c.nameEn : c.name;
+                return `<option value="${c.name}">${displayName}</option>`;
+            }).join('');
             select.innerHTML = `<option value="all">${i18n[currentLang].all_categories}</option>` + catHtml;
-            formSelect.innerHTML = catHtml;
             if(currentFilter && currentFilter !== 'all') select.value = currentFilter;
+        }
+
+        // 後台新增表單分類 (純中文)
+        function renderAdminFormCategory() {
+            const formSelect = document.getElementById('formCategory');
+            formSelect.innerHTML = allCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
         }
 
         function filterAnnouncements() {
@@ -406,6 +416,10 @@
             items.forEach(item => {
                 const subj = currentLang === 'en' && item.subjectEn ? item.subjectEn : item.subject;
                 const cont = currentLang === 'en' && item.contentEn ? item.contentEn : item.content;
+                const catObj = allCategories.find(c => c.name === item.category);
+                const catDisplay = currentLang === 'en' && catObj && catObj.nameEn ? catObj.nameEn : item.category;
+                const statusDisplay = item.status === '已發布' ? i18n[currentLang].status_published : i18n[currentLang].status_draft;
+
                 const images = item.imageUrls ? item.imageUrls.split('||').filter(u=>u) : [];
                 const firstImg = images.length > 0 ? getDirectImageUrl(images[0]) : '';
                 const catColor = getCategoryColor(item.category);
@@ -423,8 +437,8 @@
                     <div class="announcement-card" onclick="openDetailModal('${item.id}')">
                         <div class="card-image-wrapper">
                             ${firstImg ? `<img src="${firstImg}">` : `<div class="card-image-placeholder"><i class="bi bi-image"></i></div>`}
-                            <span class="position-absolute top-0 start-0 m-2 category-badge" style="background:${catColor}20;color:${catColor};border:1px solid ${catColor}40;">${item.category}</span>
-                            <span class="position-absolute top-0 end-0 m-2 category-badge bg-white text-dark"><span class="status-dot ${statusClass}"></span>${item.status}</span>
+                            <span class="position-absolute top-0 start-0 m-2 category-badge" style="background:${catColor}20;color:${catColor};border:1px solid ${catColor}40;">${catDisplay}</span>
+                            <span class="position-absolute top-0 end-0 m-2 category-badge bg-white text-dark"><span class="status-dot ${statusClass}"></span>${statusDisplay}</span>
                         </div>
                         <div class="card-body-custom">
                             <div class="card-title">${escapeHtml(subj)}</div>
@@ -447,6 +461,9 @@
             if(!item) return;
             const subj = currentLang === 'en' && item.subjectEn ? item.subjectEn : item.subject;
             const cont = escapeHtml(currentLang === 'en' && item.contentEn ? item.contentEn : item.content);
+            const catObj = allCategories.find(c => c.name === item.category);
+            const catDisplay = currentLang === 'en' && catObj && catObj.nameEn ? catObj.nameEn : item.category;
+
             const images = item.imageUrls ? item.imageUrls.split('||').filter(u=>u) : [];
             const catColor = getCategoryColor(item.category);
             
@@ -476,7 +493,7 @@
             }
 
             document.getElementById('detailBody').innerHTML = `
-                <span class="category-badge mb-3" style="background:${catColor}20;color:${catColor};">${item.category}</span>
+                <span class="category-badge mb-3" style="background:${catColor}20;color:${catColor};">${catDisplay}</span>
                 <h4 class="fw-bold mb-3">${subj}</h4>
                 <div style="white-space:pre-wrap; line-height:1.7;">${formattedContent}</div>
                 ${remainHtml} ${vidHtml}
@@ -484,7 +501,7 @@
             new bootstrap.Modal(document.getElementById('detailModal')).show();
         }
 
-        // ==================== 表單與上傳 ====================
+        // ==================== 宣導事項表單 (管理員) ====================
         let annModal;
         function openAddModal() {
             if(!annModal) annModal = new bootstrap.Modal(document.getElementById('announcementModal'));
@@ -537,7 +554,7 @@
         }
 
         async function deleteAnnouncement(id) {
-            if(!confirm(currentLang==='zh'?'確定刪除？':'Confirm delete?')) return;
+            if(!confirm('確認刪除該筆宣導事項？')) return;
             const res = await callGAS('deleteAnnouncement', { id });
             if(res.success) { showToast('刪除成功', 'success'); loadAllData(); }
             else showToast(res.message, 'error');
@@ -580,7 +597,7 @@
             });
         }
 
-        // ==================== 分類管理 ====================
+        // ==================== 分類管理 (管理員) ====================
         let catModal;
         function openCategoryModal() {
             if(!catModal) catModal = new bootstrap.Modal(document.getElementById('categoryModal'));
@@ -592,9 +609,12 @@
             const container = document.getElementById('categoryList');
             container.innerHTML = allCategories.map((c, i) => `
                 <div class="category-list-item">
-                    <span class="fw-bold"><span class="status-dot" style="background:${colorPalette[i%colorPalette.length]}"></span>${escapeHtml(c.name)}</span>
+                    <span class="fw-bold">
+                        <span class="status-dot" style="background:${colorPalette[i%colorPalette.length]}"></span>
+                        ${escapeHtml(c.name)} <small class="text-muted">(${escapeHtml(c.nameEn || '')})</small>
+                    </span>
                     <div>
-                        <button class="btn btn-sm btn-outline-primary rounded-pill px-2" onclick="editCat('${escapeHtml(c.name)}')"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-2" onclick="editCat('${escapeHtml(c.name)}', '${escapeHtml(c.nameEn || '')}')"><i class="bi bi-pencil"></i></button>
                         <button class="btn btn-sm btn-outline-danger rounded-pill px-2" onclick="deleteCat('${escapeHtml(c.name)}')"><i class="bi bi-trash"></i></button>
                     </div>
                 </div>
@@ -603,16 +623,18 @@
 
         async function addCategory() {
             const n = document.getElementById('newCategoryName').value.trim();
-            if(!n) return;
-            const res = await callGAS('addCategory', { name: n });
-            if(res.success) { document.getElementById('newCategoryName').value=''; loadAllData().then(renderCategoryManager); }
+            const ne = document.getElementById('newCategoryNameEn').value.trim() || n;
+            if(!n) return showToast('請填寫中文分類名稱', 'error');
+            const res = await callGAS('addCategory', { payload: { name: n, nameEn: ne } });
+            if(res.success) { document.getElementById('newCategoryName').value=''; document.getElementById('newCategoryNameEn').value=''; loadAllData().then(renderCategoryManager); }
             else showToast(res.message, 'error');
         }
 
-        async function editCat(oldN) {
-            const newN = prompt('輸入新名稱:', oldN);
-            if(!newN || newN===oldN) return;
-            const res = await callGAS('updateCategory', { oldName: oldN, newName: newN });
+        async function editCat(oldN, oldEn) {
+            const newN = prompt('輸入新的中文名稱:', oldN);
+            if(!newN || newN.trim() === '') return;
+            const newEn = prompt('輸入新的英文名稱:', oldEn) || newN;
+            const res = await callGAS('updateCategory', { payload: { oldName: oldN, newName: newN.trim(), newNameEn: newEn.trim() } });
             if(res.success) loadAllData().then(renderCategoryManager);
         }
 
