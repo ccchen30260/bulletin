@@ -524,6 +524,17 @@
             annModal.show();
         }
 
+        async function autoTranslate(text) {
+            if (!text) return '';
+            try {
+                const { data, error } = await sb.functions.invoke('translate', { body: { text } });
+                if (error) return text; // 翻譯失敗就退回原文，不擋儲存
+                return data.translated || text;
+            } catch (e) {
+                return text;
+            }
+        }
+
         async function saveAnnouncement() {
             const id = document.getElementById('formId').value;
             const subject = document.getElementById('formSubject').value.trim();
@@ -531,6 +542,11 @@
             if (!subject || !content) return showToast('中文主旨與內文為必填', 'error');
 
             showToast('儲存中...', 'success');
+
+            let subjectEn = document.getElementById('formSubjectEn').value.trim();
+            let contentEn = document.getElementById('formContentEn').value.trim();
+            if (!subjectEn) subjectEn = await autoTranslate(subject);
+            if (!contentEn) contentEn = await autoTranslate(content);
 
             // 刪除被移除的圖片
             if (deletedImagesList.length > 0) {
@@ -547,9 +563,9 @@
 
             const payload = {
                 subject,
-                subject_en: document.getElementById('formSubjectEn').value.trim() || null,
+                subject_en: subjectEn || null,
                 content,
-                content_en: document.getElementById('formContentEn').value.trim() || null,
+                content_en: contentEn || null,
                 category_id: document.getElementById('formCategory').value || null,
                 status: document.getElementById('formStatus').value,
                 video_url: document.getElementById('formVideoUrl').value.trim() || null,
